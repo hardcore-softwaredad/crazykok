@@ -1,0 +1,10 @@
+events
+event_occurrences
+organizers
+venues
+applications
+utilities
+attendance
+documents
+research_sources
+trading_history

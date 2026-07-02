@@ -1,0 +1,150 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111827;
+  background: #f3f4f6;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #fef3c7 0%, #f3f4f6 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  margin: 4px 0 8px;
+  font-size: 2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  color: #92400e;
+}
+
+.hero-card,
+.toolbar,
+.list-panel,
+.detail-panel {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.hero-card {
+  display: flex;
+  gap: 16px;
+  min-width: 260px;
+}
+
+.hero-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toolbar {
+  margin-bottom: 16px;
+}
+
+.toolbar input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  padding: 10px 14px;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 16px;
+}
+
+.list-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.event-card.selected {
+  border-color: #f59e0b;
+  background: #fff7ed;
+}
+
+.detail-panel h2 {
+  margin-top: 0;
+}
+
+.detail-panel dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.detail-panel dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.detail-panel dd {
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+
+.empty-state {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .content-grid {
+    display: block;
+  }
+
+  .hero-card {
+    margin-top: 16px;
+  }
+
+  .list-panel {
+    margin-bottom: 16px;
+  }
+}
