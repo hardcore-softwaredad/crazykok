@@ -74,3 +74,20 @@ Deliverables:
 - operation outcomes
 - year-over-year comparisons
 - revenue/cost/profit tracking
+
+## Milestone 08 — HATEOS API Navigation
+
+Deliverables:
+
+- HATEOS scaffolding to api results
+- links to navigate via the api (next, previous, related object records)
+
+## Milestone 09 — Decision Log
+
+Deliverables:
+
+- web accessible UI for ADRs
+- navigation between recods (next, previous)
+- overview of all adrs linking to their markdown view
+- filter & search by tags, categories, keywords, search hit
+- expose on new subdomain 'docs.crazykok'
