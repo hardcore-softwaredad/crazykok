@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
-import logoUrl from './assets/crazykoklogo.png'
+import logoUrl from './assets/crazykok-logo.png'
 
 type EventRecord = {
   id: number
