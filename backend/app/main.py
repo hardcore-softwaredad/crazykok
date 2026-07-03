@@ -1,3 +1,5 @@
+import os
+
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -8,9 +10,19 @@ from .database import Base, engine, get_db
 from .schemas import EventCreate, EventRead, EventUpdate, OrganizerRead, VenueRead
 
 app = FastAPI(title="Crazy Kok", version="0.1.0")
+
+
+def cors_allowed_origins() -> list[str]:
+    configured_origins = os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "https://app.localhost",
+    )
+    return [origin.strip() for origin in configured_origins.split(",") if origin.strip()]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

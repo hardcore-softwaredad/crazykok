@@ -1,43 +1,16 @@
-# Crazy Kok
+# Drenthe Opportunities & Operations — Filled ADR Pack
 
-A local-first web application for tracking mobile food vending opportunities and related operations in Drenthe.
+Expanded Architecture Decision Records for the project.
 
-## Stack
+Copy `docs/adr/` into the repository, replacing earlier placeholder ADRs.
 
-- FastAPI
-- SQLAlchemy
-- Alembic
-- SQLite
-- React + TypeScript + Vite
-- Docker
+Active scope remains:
 
-## Local development
+1. Opportunities
+2. Applications
+3. Operations
+4. Operation Outcomes
+5. Map/calendar planning
+6. ICS calendar feeds
 
-### Backend
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Tests
-
-```bash
-pytest backend/tests
-```
-
-## Docker
-
-```bash
-docker compose up --build
-```
+Commerce, inventory, QR/barcodes, online orders, shipping, and delivery tracking are captured in the parking lot but deferred.

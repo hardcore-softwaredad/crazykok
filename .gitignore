@@ -1,7 +1,12 @@
 __pycache__/
 *.py[cod]
+.DS_Store
 .venv/
 .env
+.env.*
+!.env.example
+docker/certs/*
+!docker/certs/.gitkeep
 *.db
 node_modules/
 dist/
