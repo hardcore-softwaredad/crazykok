@@ -1,22 +1,17 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import logoUrl from './assets/crazykok-logo.png'
-
-type EventRecord = {
-  id: number
-  name: string
-  description: string | null
-  location: string | null
-  event_date: string | null
-  application_deadline: string | null
-  organizer: string | null
-  category: string | null
-  application_status: string
-  source_url: string | null
-  notes: string | null
-  expected_revenue: number | null
-  expected_attendance: number | null
-  is_active: boolean
-}
+import ImportWorkspace from './ImportWorkspace'
+import VenueWorkspace from './VenueWorkspace'
+import {
+  createOpportunity,
+  deleteOpportunity,
+  findOpportunities,
+  followOpportunityPage,
+  type HalLinks,
+  type Opportunity,
+  type PageMetadata,
+  updateOpportunity,
+} from './api'
 
 type EventForm = {
   name: string
@@ -44,7 +39,6 @@ type SortKey =
   | 'expected_revenue'
   | 'expected_attendance'
 
-const API_BASE = '/api'
 const STATUS_OPTIONS = ['researching', 'watchlist', 'applied', 'accepted', 'rejected', 'skipped']
 
 const emptyForm: EventForm = {
@@ -63,7 +57,7 @@ const emptyForm: EventForm = {
   is_active: true,
 }
 
-function toForm(event: EventRecord): EventForm {
+function toForm(event: Opportunity): EventForm {
   return {
     name: event.name,
     description: event.description ?? '',
@@ -99,15 +93,10 @@ function formToPayload(form: EventForm) {
   }
 }
 
-function compareValues(a: string | number | null, b: string | number | null) {
-  if (a === b) return 0
-  if (a === null) return 1
-  if (b === null) return -1
-  return a > b ? 1 : -1
-}
-
-function App() {
-  const [events, setEvents] = useState<EventRecord[]>([])
+function OpportunityWorkspace() {
+  const [events, setEvents] = useState<Opportunity[]>([])
+  const [page, setPage] = useState<PageMetadata>({ number: 1, size: 25, total_elements: 0, total_pages: 0 })
+  const [pageLinks, setPageLinks] = useState<HalLinks>({})
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [activeFilter, setActiveFilter] = useState<'active' | 'archived' | 'all'>('active')
@@ -122,23 +111,25 @@ function App() {
 
   const selectedEvent = events.find((event) => event.id === selectedEventId) ?? null
 
-  const loadEvents = async () => {
+  const loadEvents = async (href?: string) => {
     setIsLoading(true)
     setError(null)
 
     try {
-      const params = new URLSearchParams()
-      if (query) params.set('q', query)
-      if (statusFilter) params.set('status', statusFilter)
-      if (activeFilter !== 'all') params.set('active', String(activeFilter === 'active'))
-
-      const response = await fetch(`${API_BASE}/events?${params.toString()}`)
-      if (!response.ok) {
-        throw new Error('Unable to load events')
-      }
-
-      const data = (await response.json()) as EventRecord[]
+      const collection = href
+        ? await followOpportunityPage(href)
+        : await findOpportunities({
+            q: query || undefined,
+            status: statusFilter || undefined,
+            active: activeFilter === 'all' ? undefined : activeFilter === 'active',
+            sort: sortKey,
+            direction: sortDirection,
+            page_size: 25,
+          })
+      const data = collection._embedded.opportunities
       setEvents(data)
+      setPage(collection.page)
+      setPageLinks(collection._links)
       setSelectedEventId((currentId) => {
         if (isCreating) return currentId
         if (data.length === 0) return null
@@ -147,6 +138,8 @@ function App() {
     } catch {
       setError('The API is not available yet.')
       setEvents([])
+      setPage({ number: 1, size: 25, total_elements: 0, total_pages: 0 })
+      setPageLinks({})
       setSelectedEventId(null)
     } finally {
       setIsLoading(false)
@@ -155,7 +148,7 @@ function App() {
 
   useEffect(() => {
     loadEvents()
-  }, [query, statusFilter, activeFilter])
+  }, [query, statusFilter, activeFilter, sortKey, sortDirection])
 
   useEffect(() => {
     if (selectedEvent && !isCreating) {
@@ -163,21 +156,15 @@ function App() {
     }
   }, [selectedEvent?.id, isCreating])
 
-  const sortedEvents = useMemo(() => {
-    return [...events].sort((left, right) => {
-      const direction = sortDirection === 'asc' ? 1 : -1
-      return compareValues(left[sortKey], right[sortKey]) * direction
-    })
-  }, [events, sortDirection, sortKey])
-
   const summary = useMemo(
     () => ({
-      total: events.length,
+      total: page.total_elements,
+      pageCount: events.length,
       active: events.filter((event) => event.is_active).length,
       deadlines: events.filter((event) => event.application_deadline).length,
       revenue: events.reduce((sum, event) => sum + (event.expected_revenue ?? 0), 0),
     }),
-    [events],
+    [events, page.total_elements],
   )
 
   const updateForm = (field: keyof EventForm, value: string | boolean) => {
@@ -190,7 +177,7 @@ function App() {
     setForm(emptyForm)
   }
 
-  const selectEvent = (event: EventRecord) => {
+  const selectEvent = (event: Opportunity) => {
     setIsCreating(false)
     setSelectedEventId(event.id)
     setForm(toForm(event))
@@ -202,23 +189,15 @@ function App() {
     setError(null)
 
     try {
-      const url = isCreating ? `${API_BASE}/events` : `${API_BASE}/events/${selectedEventId}`
-      const response = await fetch(url, {
-        method: isCreating ? 'POST' : 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formToPayload(form)),
-      })
-
-      if (!response.ok) {
-        throw new Error('Unable to save event')
-      }
-
-      const savedEvent = (await response.json()) as EventRecord
+      const payload = formToPayload(form)
+      const savedEvent = isCreating
+        ? await createOpportunity(payload)
+        : await updateOpportunity(selectedEvent as Opportunity, payload)
       setIsCreating(false)
       setSelectedEventId(savedEvent.id)
       await loadEvents()
     } catch {
-      setError('Could not save this event.')
+      setError('Could not save this opportunity.')
     } finally {
       setIsSaving(false)
     }
@@ -226,8 +205,7 @@ function App() {
 
   const archiveSelected = async () => {
     if (!selectedEvent) return
-    const endpoint = selectedEvent.is_active ? 'archive' : 'restore'
-    await fetch(`${API_BASE}/events/${selectedEvent.id}/${endpoint}`, { method: 'POST' })
+    await updateOpportunity(selectedEvent, { is_active: !selectedEvent.is_active })
     await loadEvents()
   }
 
@@ -236,7 +214,7 @@ function App() {
     const confirmed = window.confirm(`Permanently delete ${selectedEvent.name}?`)
     if (!confirmed) return
 
-    await fetch(`${API_BASE}/events/${selectedEvent.id}`, { method: 'DELETE' })
+    await deleteOpportunity(selectedEvent)
     setSelectedEventId(null)
     await loadEvents()
   }
@@ -262,16 +240,16 @@ function App() {
         </div>
         <div className="summary-strip">
           <span>
-            <strong>{summary.total}</strong> rows
+            <strong>{summary.total}</strong> matching
           </span>
           <span>
-            <strong>{summary.active}</strong> active
+            <strong>{summary.pageCount}</strong> on page
           </span>
           <span>
-            <strong>{summary.deadlines}</strong> deadlines
+            <strong>{summary.deadlines}</strong> page deadlines
           </span>
           <span>
-            <strong>€{summary.revenue}</strong> projected
+            <strong>€{summary.revenue}</strong> page projected
           </span>
         </div>
       </header>
@@ -292,7 +270,7 @@ function App() {
           <option value="all">All rows</option>
         </select>
         <button className="primary-action" onClick={beginCreate}>
-          New event
+            New opportunity
         </button>
       </section>
 
@@ -304,7 +282,7 @@ function App() {
             <thead>
               <tr>
                 <th>
-                  <button onClick={() => toggleSort('name')}>Event</button>
+                  <button onClick={() => toggleSort('name')}>Opportunity</button>
                 </th>
                 <th>
                   <button onClick={() => toggleSort('event_date')}>Date</button>
@@ -332,15 +310,15 @@ function App() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={8}>Loading events...</td>
+                  <td colSpan={8}>Loading opportunities...</td>
                 </tr>
               ) : null}
-              {!isLoading && sortedEvents.length === 0 ? (
+              {!isLoading && events.length === 0 ? (
                 <tr>
-                  <td colSpan={8}>No matching events yet.</td>
+                  <td colSpan={8}>No matching opportunities yet.</td>
                 </tr>
               ) : null}
-              {sortedEvents.map((event) => (
+              {events.map((event) => (
                 <tr
                   key={event.id}
                   className={event.id === selectedEventId ? 'selected-row' : ''}
@@ -363,11 +341,20 @@ function App() {
               ))}
             </tbody>
           </table>
+          <div className="pagination" aria-label="Opportunity pages">
+            <button disabled={!pageLinks.prev || isLoading} onClick={() => pageLinks.prev && loadEvents(pageLinks.prev.href)}>
+              Previous
+            </button>
+            <span>Page {page.number}{page.total_pages ? ` of ${page.total_pages}` : ''}</span>
+            <button disabled={!pageLinks.next || isLoading} onClick={() => pageLinks.next && loadEvents(pageLinks.next.href)}>
+              Next
+            </button>
+          </div>
         </section>
 
         <aside className="editor-panel">
           <div className="panel-heading">
-            <h2>{isCreating ? 'New event' : selectedEvent ? 'Edit event' : 'Event detail'}</h2>
+            <h2>{isCreating ? 'New opportunity' : selectedEvent ? 'Edit opportunity' : 'Opportunity detail'}</h2>
             {selectedEvent ? (
               <div className="panel-actions">
                 <button onClick={archiveSelected}>{selectedEvent.is_active ? 'Archive' : 'Restore'}</button>
@@ -381,12 +368,12 @@ function App() {
           {isCreating || selectedEvent ? (
             <form className="event-form" onSubmit={saveEvent}>
               <label>
-                Event name
+                Opportunity name
                 <input value={form.name} onChange={(event) => updateForm('name', event.target.value)} required />
               </label>
               <div className="form-grid">
                 <label>
-                  Event date
+                  Opportunity date
                   <input type="date" value={form.event_date} onChange={(event) => updateForm('event_date', event.target.value)} />
                 </label>
                 <label>
@@ -461,14 +448,32 @@ function App() {
                 <textarea value={form.notes} onChange={(event) => updateForm('notes', event.target.value)} rows={5} />
               </label>
               <button className="primary-action" type="submit" disabled={isSaving}>
-                {isSaving ? 'Saving...' : 'Save event'}
+                {isSaving ? 'Saving...' : 'Save opportunity'}
               </button>
             </form>
           ) : (
-            <p className="empty-state">Select a row or create a new event.</p>
+            <p className="empty-state">Select a row or create a new opportunity.</p>
           )}
         </aside>
       </main>
+    </div>
+  )
+}
+
+function App() {
+  const [view, setView] = useState<'opportunities' | 'venues' | 'import'>('venues')
+
+  return (
+    <div>
+      <nav className="app-navigation" aria-label="Primary navigation">
+        <div className="nav-brand"><img src={logoUrl} alt="" /><strong>Crazy Kok</strong></div>
+        <div className="nav-links">
+          <button className={view === 'opportunities' ? 'active' : ''} onClick={() => setView('opportunities')}>Opportunities</button>
+          <button className={view === 'venues' ? 'active' : ''} onClick={() => setView('venues')}>Venues</button>
+          <button className={view === 'import' ? 'active' : ''} onClick={() => setView('import')}>Import venues</button>
+        </div>
+      </nav>
+      {view === 'opportunities' ? <OpportunityWorkspace /> : view === 'venues' ? <VenueWorkspace /> : <ImportWorkspace />}
     </div>
   )
 }

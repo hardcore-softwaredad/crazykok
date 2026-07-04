@@ -15,7 +15,7 @@ describe('decision log application', () => {
     render(<DocsApp />)
 
     expect(screen.getByRole('heading', { name: 'Decision Log' })).toBeInTheDocument()
-    expect(screen.getByText('27 decisions')).toBeInTheDocument()
+    expect(screen.getByText(/\d+ decisions/)).toBeInTheDocument()
     await user.type(screen.getByRole('searchbox', { name: 'Search decisions' }), 'filesystem gatekeeper')
     expect(screen.getByText('1 decision')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Use A Filesystem-Backed Decision Log/i })).toBeInTheDocument()

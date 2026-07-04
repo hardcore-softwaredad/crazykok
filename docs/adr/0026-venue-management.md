@@ -3,22 +3,21 @@ schema_version: 1
 id: '0026'
 slug: venue-management
 title: Treat Venues As Managed Domain Records
-status: proposed
+status: accepted
 date: '2026-07-03'
 category: domain
 tags:
-  - location
-  - venue
+- location
+- venue
 keywords:
-  - venue management
-  - geocoding
-  - address
+- address
+- geocoding
+- venue management
 supersedes: []
 superseded_by: []
 ---
 
 # ADR 0026: Treat Venues As Managed Domain Records
-
 
 ## Context
 

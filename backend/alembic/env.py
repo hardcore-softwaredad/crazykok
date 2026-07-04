@@ -1,14 +1,25 @@
 from logging.config import fileConfig
+import os
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from backend.app.database import Base
 from backend.app import models
+from backend.app.migration_bootstrap import bootstrap_unversioned_schema
 
 config = context.config
 
-if config.config_file_name is not None:
+if os.getenv("DATABASE_URL"):
+    config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
+
+if config.config_file_name is not None and config.file_config.has_section("loggers"):
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
@@ -29,6 +40,8 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        with connection.begin():
+            bootstrap_unversioned_schema(connection)
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
             context.run_migrations()

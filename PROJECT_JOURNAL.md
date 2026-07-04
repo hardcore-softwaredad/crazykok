@@ -72,3 +72,40 @@ application database nor a runtime API.
 Inspect and submit structured proposals through the internal ADR API, review
 the generated file at `https://docs.crazykok.local`, and commit it through Git
 outside the API.
+
+## Milestone 08 — HATEOAS API Navigation
+
+### Date
+
+2026-07-04
+
+### Summary
+
+Added a versioned HAL API that clients can discover and navigate without
+constructing resource URLs from record identifiers.
+
+### Key Changes
+
+- Added `/v1` discovery with links to implemented public resources and an RFC
+  6570 opportunity-search template.
+- Added HAL resource and paginated collection representations for
+  opportunities, organizers, and venues.
+- Added centralized proxy-aware link construction, problem responses,
+  deterministic pagination, create `Location` headers, and deprecated legacy
+  route headers.
+- Migrated the React opportunity workspace to discover and follow API links,
+  including server-side previous/next navigation.
+- Added a fail-closed migration bootstrap for recognized databases created
+  before Alembic revision tracking, preserving the existing SQLite volume.
+- Recorded the representation decision as accepted ADR 0028 through the local
+  authoring gatekeeper.
+- Added backend and frontend contract tests for discovery, link relations,
+  pagination, proxy prefixes, errors, compatibility, and migration recovery.
+
+### Verification
+
+- 29 backend tests pass in the freshly rebuilt API image.
+- 13 frontend tests pass.
+- The production frontend build succeeds and contains 29 generated ADRs.
+- The persisted SQLite volume migrates successfully and the live `/v1`
+  endpoint returns `application/hal+json` discovery links.

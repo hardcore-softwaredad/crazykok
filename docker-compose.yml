@@ -10,6 +10,10 @@ services:
       ADR_AUTHORING_ENABLED: ${ADR_AUTHORING_ENABLED:-true}
       ADR_DIRECTORY: ${ADR_DIRECTORY:-/app/docs/adr}
       DOCS_ORIGIN: ${DOCS_ORIGIN:-https://docs.crazykok.local}
+      TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-true}
+      PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:-}
+      ATTACHMENT_ROOT: ${ATTACHMENT_ROOT:-/data/attachments}
+      MAX_ATTACHMENT_BYTES: ${MAX_ATTACHMENT_BYTES:-20971520}
     ports:
       - "127.0.0.1:${API_PORT:-8000}:8000"
     volumes:

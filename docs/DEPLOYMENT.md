@@ -18,10 +18,14 @@ no `.env` file stays in development and only serves `.local` names.
 | `ADR_AUTHORING_ENABLED` | `true` in the local Compose environment | Enables the loopback-only ADR filesystem gatekeeper. Must be `false` in production. |
 | `ADR_DIRECTORY` | `/app/docs/adr` | Canonical ADR directory mounted read-write into the local API only. |
 | `DOCS_ORIGIN` | `https://docs.crazykok.local` | Base URL returned after an ADR file is created. |
+| `TRUST_PROXY_HEADERS` | `true` locally | Allows API links to use forwarded scheme, host, and `/api` prefix. Set only when requests pass through a trusted proxy. |
+| `PUBLIC_API_BASE_URL` | empty | Optional canonical versioned API root, such as `https://api.crazykok.com/v1`, when proxy-derived links are unsuitable. |
 | `WEB_PORT` | `80` | HTTP port; valid app/API hosts redirect to HTTPS. |
 | `HTTPS_PORT` | `443` | HTTPS port for the Nginx gateway. |
 | `API_PORT` | `8000` | Loopback-only host port for direct API debugging. |
 | `DATABASE_URL` | `sqlite:////data/app.db` | SQLAlchemy database URL. |
+| `ATTACHMENT_ROOT` | `/data/attachments` | Local venue document/photo storage beneath the persistent API data volume. |
+| `MAX_ATTACHMENT_BYTES` | `20971520` | Maximum accepted venue upload size in bytes. |
 
 The frontend uses the same-origin `/api` route through Nginx. The API is also
 available directly at `https://api.crazykok.local`; this keeps the frontend simple
@@ -72,6 +76,8 @@ APP_DOMAIN=crazykok.com
 APP_DOMAIN_ALIAS=app.crazykok.com
 API_DOMAIN=api.crazykok.com
 DOCS_DOMAIN=docs.crazykok.com
+TRUST_PROXY_HEADERS=true
+PUBLIC_API_BASE_URL=https://api.crazykok.com/v1
 CORS_ALLOWED_ORIGINS=https://crazykok.com,https://app.crazykok.com
 DATABASE_URL=postgresql+psycopg://USER:PASSWORD@HOST:5432/DATABASE
 ADR_AUTHORING_ENABLED=false
@@ -91,3 +97,8 @@ no database or runtime API dependency. Rebuild and deploy the web image after
 committed ADR changes. Do not mount the repository into the public web
 container. The internal authoring endpoints are explicitly blocked by Nginx;
 keep `ADR_AUTHORING_ENABLED=false` as an independent production safeguard.
+
+The `api-data` volume contains both SQLite and venue attachments. Back up and
+restore them together so attachment metadata and bytes remain consistent.
+Archiving a venue or attachment record does not immediately delete its bytes;
+orphan cleanup should run only after a verified backup.
