@@ -36,3 +36,13 @@ Keep the README useful as a new-developer guide: distinguish implemented
 features from roadmap scope, link to the authoritative detailed document or
 ADR instead of duplicating it, verify commands and URLs against the current
 repository, and remove stale information as part of the update.
+
+## Push agent-created commits
+
+After creating a commit requested by the user, push the current branch to its
+configured GitHub remote unless the user explicitly asks to keep the commit
+local. Set the upstream when publishing a new branch. A push must contain only
+committed work: never stage, commit, discard, or otherwise alter unrelated
+working-tree changes merely to make a push possible. Report the pushed branch
+and commit, or report the exact blocker when authentication, permissions,
+branch protection, or remote history prevents the push.
