@@ -26,6 +26,7 @@ export type Opportunity = {
   notes: string | null
   expected_revenue: number | null
   expected_attendance: number | null
+  profit_score?: number | null
   is_active: boolean
   venue_id: number | null
   _links: HalLinks
@@ -54,6 +55,41 @@ export type VenueCollection = {
   _links: HalLinks
   page: PageMetadata
   _embedded: { venues: Venue[] }
+}
+
+export type PlanningOperation = {
+  id: number
+  status: string
+  commitment_date: string | null
+  _links: HalLinks
+}
+
+export type PlanningOpportunity = {
+  id: number
+  name: string
+  event_date: string | null
+  application_deadline: string | null
+  application_status: string
+  profit_score: number | null
+  distance_km: number | null
+  venue?: {
+    id: number
+    name: string
+    latitude: number | null
+    longitude: number | null
+  }
+  operations: PlanningOperation[]
+  _links: HalLinks
+}
+
+export type PlanningResponse = {
+  opportunities: PlanningOpportunity[]
+  warnings: {
+    code: 'missing_coordinates' | 'missing_date'
+    opportunity_id: number
+    title: string
+  }[]
+  _links: HalLinks
 }
 
 type ApiRoot = {
@@ -159,4 +195,11 @@ export function updateOpportunity(opportunity: Opportunity, payload: unknown): P
 
 export function deleteOpportunity(opportunity: Opportunity): Promise<void> {
   return request<void>(opportunity._links.self.href, { method: 'DELETE' })
+}
+
+export async function findPlanning(
+  filters: Record<string, string | number | boolean | undefined>,
+): Promise<PlanningResponse> {
+  const root = await apiRoot()
+  return request<PlanningResponse>(expandQueryTemplate(root._links.planning, filters))
 }

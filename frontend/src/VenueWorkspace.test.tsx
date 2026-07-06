@@ -96,4 +96,30 @@ describe('venue workspace', () => {
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/venues', expect.objectContaining({ method: 'POST' })))
   })
+
+  it('offers inline preview and download actions for venue documents', async () => {
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url === '/api/v1') return apiRoot()
+      if (url.endsWith('/venues/schema')) return jsonResponse(schema)
+      if (url.includes('/v1/venues?')) return venueCollection([venue])
+      if (url.endsWith('/venues/1/documents')) return jsonResponse([{
+        id: 7,
+        venue_id: 1,
+        title: 'Site map',
+        local_path: 'documents/site-map.pdf',
+      }])
+      return jsonResponse([])
+    }))
+
+    const user = userEvent.setup()
+    render(<VenueWorkspace />)
+    await screen.findByRole('heading', { name: 'Test Square' })
+    await user.click(screen.getByRole('button', { name: 'documents' }))
+
+    const preview = await screen.findByRole('link', { name: 'Preview attachment' })
+    expect(preview).toHaveAttribute('href', '/api/venues/1/documents/7/preview')
+    expect(preview).toHaveAttribute('target', '_blank')
+    expect(screen.getByRole('link', { name: 'Download attachment' })).toHaveAttribute('href', '/api/venues/1/documents/7/download')
+  })
 })

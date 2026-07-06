@@ -6,6 +6,8 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-development}
       DATABASE_URL: ${DATABASE_URL:-sqlite:////data/app.db}
+      PLANNING_HOME_LATITUDE: ${PLANNING_HOME_LATITUDE:-52.6627}
+      PLANNING_HOME_LONGITUDE: ${PLANNING_HOME_LONGITUDE:-6.8847}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://crazykok.local,https://app.crazykok.local,https://api-docs.crazykok.local}
       ADR_AUTHORING_ENABLED: ${ADR_AUTHORING_ENABLED:-true}
       ADR_DIRECTORY: ${ADR_DIRECTORY:-/app/docs/adr}

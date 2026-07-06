@@ -1,5 +1,34 @@
 # Project Journal
 
+## Milestone 05 — Map And Calendar Planning Views
+
+### Date
+
+2026-07-05
+
+### Summary
+
+Added one planning desk for spatial and calendar decisions using Leaflet and
+FullCalendar.
+
+### Key Changes
+
+- Added a filterable HAL planning projection joining opportunities, venue
+  coordinates, application deadlines, and committed operations.
+- Added minimal committed-operation records without pulling Milestone 07's
+  detailed staffing, equipment, and outcome workflow forward.
+- Added straight-line distance filtering from a configurable Schoonebeek home
+  location and editable 0–100 profit scores.
+- Added map markers, calendar entries, in-context detail, and visible warnings
+  for missing coordinates or dates.
+- Accepted ADR 0021 through the local authoring gatekeeper and added backend and
+  frontend coverage for planning behavior.
+
+### Why This Matters
+
+Opportunity research can now be turned into a practical view of where work is,
+when applications are due, and which dates are already committed.
+
 ## Milestone 11 — API Contract And Interactive Docs
 
 ### Date

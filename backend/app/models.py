@@ -24,12 +24,14 @@ class Opportunity(Base):
     notes = Column(Text, nullable=True)
     expected_revenue = Column(Integer, nullable=True)
     expected_attendance = Column(Integer, nullable=True)
+    profit_score = Column(Float, nullable=True, index=True)
     is_active = Column(Boolean, nullable=False, default=True)
     venue_id = Column(Integer, ForeignKey("venues.id", ondelete="SET NULL"), nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
 
     venue = relationship("Venue", back_populates="opportunities")
+    operations = relationship("Operation", back_populates="opportunity", cascade="all, delete-orphan")
 
 
 # Temporary source-compatibility alias while the existing opportunity UI is migrated.
@@ -44,6 +46,22 @@ class Organizer(Base):
     contact_email = Column(String(255), nullable=True)
     phone = Column(String(50), nullable=True)
     notes = Column(Text, nullable=True)
+
+
+class Operation(Base):
+    __tablename__ = "operations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    opportunity_id = Column(
+        Integer, ForeignKey("opportunities.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    status = Column(String(50), nullable=False, default="committed", index=True)
+    commitment_date = Column(Date, nullable=True)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
+
+    opportunity = relationship("Opportunity", back_populates="operations")
 
 
 class Venue(Base):

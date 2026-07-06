@@ -14,6 +14,8 @@ schemathesis run "$schema" \
   --include-operation-id api_v1_list_opportunities_v1_opportunities_get \
   --include-operation-id api_v1_list_organizers_v1_organizers_get \
   --include-operation-id api_v1_list_venues_v1_venues_get \
+  --include-operation-id api_v1_list_operations_v1_operations_get \
+  --include-operation-id api_v1_planning_v1_planning_get \
   --include-operation-id api_v1_description_v1_api_description_get \
   --include-operation-id api_v1_openapi_json_v1_openapi_json_get \
   --include-operation-id api_v1_openapi_yaml_v1_openapi_yaml_get \

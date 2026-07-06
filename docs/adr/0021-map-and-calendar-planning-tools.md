@@ -3,22 +3,21 @@ schema_version: 1
 id: '0021'
 slug: map-and-calendar-planning-tools
 title: Add Map And Calendar Planning Tools
-status: proposed
+status: accepted
 date: '2026-07-03'
 category: frontend
 tags:
-  - calendar
-  - map
+- calendar
+- map
 keywords:
-  - planning views
-  - Leaflet
-  - FullCalendar
+- fullcalendar
+- leaflet
+- planning views
 supersedes: []
 superseded_by: []
 ---
 
 # ADR 0021: Add Map And Calendar Planning Tools
-
 
 ## Context
 

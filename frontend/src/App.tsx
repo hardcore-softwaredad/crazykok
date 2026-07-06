@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react'
 import logoUrl from './assets/crazykok-logo.png'
 import ImportWorkspace from './ImportWorkspace'
 import VenueWorkspace from './VenueWorkspace'
+import PlanningWorkspace from './PlanningWorkspace'
 import {
   createOpportunity,
   deleteOpportunity,
@@ -26,6 +27,7 @@ type EventForm = {
   notes: string
   expected_revenue: string
   expected_attendance: string
+  profit_score: string
   is_active: boolean
 }
 
@@ -38,6 +40,7 @@ type SortKey =
   | 'application_status'
   | 'expected_revenue'
   | 'expected_attendance'
+  | 'profit_score'
 
 const STATUS_OPTIONS = ['researching', 'watchlist', 'applied', 'accepted', 'rejected', 'skipped']
 
@@ -54,6 +57,7 @@ const emptyForm: EventForm = {
   notes: '',
   expected_revenue: '',
   expected_attendance: '',
+  profit_score: '',
   is_active: true,
 }
 
@@ -71,6 +75,7 @@ function toForm(event: Opportunity): EventForm {
     notes: event.notes ?? '',
     expected_revenue: event.expected_revenue?.toString() ?? '',
     expected_attendance: event.expected_attendance?.toString() ?? '',
+    profit_score: event.profit_score?.toString() ?? '',
     is_active: event.is_active,
   }
 }
@@ -89,6 +94,7 @@ function formToPayload(form: EventForm) {
     notes: form.notes.trim() || null,
     expected_revenue: form.expected_revenue ? Number(form.expected_revenue) : null,
     expected_attendance: form.expected_attendance ? Number(form.expected_attendance) : null,
+    profit_score: form.profit_score ? Number(form.profit_score) : null,
     is_active: form.is_active,
   }
 }
@@ -305,17 +311,20 @@ function OpportunityWorkspace() {
                 <th>
                   <button onClick={() => toggleSort('expected_attendance')}>Attendance</button>
                 </th>
+                <th>
+                  <button onClick={() => toggleSort('profit_score')}>Score</button>
+                </th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={8}>Loading opportunities...</td>
+                  <td colSpan={9}>Loading opportunities...</td>
                 </tr>
               ) : null}
               {!isLoading && events.length === 0 ? (
                 <tr>
-                  <td colSpan={8}>No matching opportunities yet.</td>
+                  <td colSpan={9}>No matching opportunities yet.</td>
                 </tr>
               ) : null}
               {events.map((event) => (
@@ -337,6 +346,7 @@ function OpportunityWorkspace() {
                   </td>
                   <td>{event.expected_revenue ? `€${event.expected_revenue}` : ''}</td>
                   <td>{event.expected_attendance ?? ''}</td>
+                  <td>{event.profit_score ?? ''}</td>
                 </tr>
               ))}
             </tbody>
@@ -436,6 +446,10 @@ function OpportunityWorkspace() {
                 </label>
               </div>
               <label>
+                Profit score
+                <input type="number" min="0" max="100" value={form.profit_score} onChange={(event) => updateForm('profit_score', event.target.value)} />
+              </label>
+              <label>
                 Source URL
                 <input value={form.source_url} onChange={(event) => updateForm('source_url', event.target.value)} />
               </label>
@@ -461,7 +475,7 @@ function OpportunityWorkspace() {
 }
 
 function App() {
-  const [view, setView] = useState<'opportunities' | 'venues' | 'import'>('venues')
+  const [view, setView] = useState<'opportunities' | 'planning' | 'venues' | 'import'>('venues')
 
   return (
     <div>
@@ -469,11 +483,12 @@ function App() {
         <div className="nav-brand"><img src={logoUrl} alt="" /><strong>Crazy Kok</strong></div>
         <div className="nav-links">
           <button className={view === 'opportunities' ? 'active' : ''} onClick={() => setView('opportunities')}>Opportunities</button>
+          <button className={view === 'planning' ? 'active' : ''} onClick={() => setView('planning')}>Map &amp; calendar</button>
           <button className={view === 'venues' ? 'active' : ''} onClick={() => setView('venues')}>Venues</button>
           <button className={view === 'import' ? 'active' : ''} onClick={() => setView('import')}>Import venues</button>
         </div>
       </nav>
-      {view === 'opportunities' ? <OpportunityWorkspace /> : view === 'venues' ? <VenueWorkspace /> : <ImportWorkspace />}
+      {view === 'opportunities' ? <OpportunityWorkspace /> : view === 'planning' ? <PlanningWorkspace /> : view === 'venues' ? <VenueWorkspace /> : <ImportWorkspace />}
     </div>
   )
 }

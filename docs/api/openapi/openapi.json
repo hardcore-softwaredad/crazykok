@@ -387,6 +387,201 @@
         "title": "NotDuplicateRequest",
         "type": "object"
       },
+      "OperationCollection": {
+        "properties": {
+          "_embedded": {
+            "$ref": "#/components/schemas/OperationEmbedded"
+          },
+          "_links": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HALLink"
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        },
+        "required": [
+          "_links",
+          "page",
+          "_embedded"
+        ],
+        "title": "OperationCollection",
+        "type": "object"
+      },
+      "OperationCreate": {
+        "properties": {
+          "commitment_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "opportunity_id": {
+            "maximum": 2147483647.0,
+            "minimum": 1.0,
+            "title": "Opportunity Id",
+            "type": "integer"
+          },
+          "status": {
+            "default": "committed",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "opportunity_id"
+        ],
+        "title": "OperationCreate",
+        "type": "object"
+      },
+      "OperationEmbedded": {
+        "properties": {
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/OperationHAL"
+            },
+            "title": "Operations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "operations"
+        ],
+        "title": "OperationEmbedded",
+        "type": "object"
+      },
+      "OperationHAL": {
+        "properties": {
+          "_links": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HALLink"
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "commitment_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Date"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "opportunity_id": {
+            "maximum": 2147483647.0,
+            "minimum": 1.0,
+            "title": "Opportunity Id",
+            "type": "integer"
+          },
+          "status": {
+            "default": "committed",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "opportunity_id",
+          "id",
+          "created_at",
+          "updated_at",
+          "_links"
+        ],
+        "title": "OperationHAL",
+        "type": "object"
+      },
+      "OperationUpdate": {
+        "properties": {
+          "commitment_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "maxLength": 50,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "title": "OperationUpdate",
+        "type": "object"
+      },
       "OpportunityCollection": {
         "properties": {
           "_embedded": {
@@ -530,6 +725,19 @@
               }
             ],
             "title": "Organizer"
+          },
+          "profit_score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profit Score"
           },
           "source_url": {
             "anyOf": [
@@ -724,6 +932,19 @@
             ],
             "title": "Organizer"
           },
+          "profit_score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profit Score"
+          },
           "source_url": {
             "anyOf": [
               {
@@ -891,6 +1112,19 @@
               }
             ],
             "title": "Organizer"
+          },
+          "profit_score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profit Score"
           },
           "source_url": {
             "anyOf": [
@@ -1069,6 +1303,19 @@
               }
             ],
             "title": "Organizer"
+          },
+          "profit_score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profit Score"
           },
           "source_url": {
             "anyOf": [
@@ -1285,6 +1532,248 @@
           "total_pages"
         ],
         "title": "PageMetadata",
+        "type": "object"
+      },
+      "PlanningOperation": {
+        "properties": {
+          "_links": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HALLink"
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "commitment_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Date"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "_links"
+        ],
+        "title": "PlanningOperation",
+        "type": "object"
+      },
+      "PlanningOpportunity": {
+        "properties": {
+          "_links": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HALLink"
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "application_deadline": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Application Deadline"
+          },
+          "application_status": {
+            "title": "Application Status",
+            "type": "string"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "event_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Date"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/PlanningOperation"
+            },
+            "title": "Operations",
+            "type": "array"
+          },
+          "profit_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profit Score"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanningVenue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "application_status",
+          "operations",
+          "_links"
+        ],
+        "title": "PlanningOpportunity",
+        "type": "object"
+      },
+      "PlanningResponse": {
+        "properties": {
+          "_links": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/HALLink"
+                },
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/HALLink"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "opportunities": {
+            "items": {
+              "$ref": "#/components/schemas/PlanningOpportunity"
+            },
+            "title": "Opportunities",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PlanningWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "_links",
+          "opportunities",
+          "warnings"
+        ],
+        "title": "PlanningResponse",
+        "type": "object"
+      },
+      "PlanningVenue": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "PlanningVenue",
+        "type": "object"
+      },
+      "PlanningWarning": {
+        "properties": {
+          "code": {
+            "enum": [
+              "missing_coordinates",
+              "missing_date"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "opportunity_id": {
+            "title": "Opportunity Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "opportunity_id",
+          "title"
+        ],
+        "title": "PlanningWarning",
         "type": "object"
       },
       "Problem": {
@@ -6960,6 +7449,209 @@
         ]
       }
     },
+    "/v1/operations": {
+      "get": {
+        "operationId": "api_v1_list_operations_v1_operations_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "opportunity_id",
+            "required": false,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Opportunity Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationCollection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-List-Operations",
+        "tags": [
+          "API v1"
+        ]
+      },
+      "post": {
+        "operationId": "api_v1_create_operation_v1_operations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Create-Operation",
+        "tags": [
+          "API v1"
+        ]
+      }
+    },
+    "/v1/operations/{operation_id}": {
+      "get": {
+        "operationId": "api_v1_get_operation_v1_operations__operation_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "operation_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Operation Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Get-Operation",
+        "tags": [
+          "API v1"
+        ]
+      },
+      "patch": {
+        "operationId": "api_v1_update_operation_v1_operations__operation_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "operation_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Operation Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Update-Operation",
+        "tags": [
+          "API v1"
+        ]
+      }
+    },
     "/v1/opportunities": {
       "get": {
         "operationId": "api_v1_list_opportunities_v1_opportunities_get",
@@ -7049,7 +7741,8 @@
                 "category",
                 "application_status",
                 "expected_revenue",
-                "expected_attendance"
+                "expected_attendance",
+                "profit_score"
               ],
               "title": "Sort",
               "type": "string"
@@ -7385,6 +8078,91 @@
           }
         },
         "summary": "Api-V1-Get-Organizer",
+        "tags": [
+          "API v1"
+        ]
+      }
+    },
+    "/v1/planning": {
+      "get": {
+        "operationId": "api_v1_planning_v1_planning_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "title": "Date From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "title": "Date To",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_distance_km",
+            "required": false,
+            "schema": {
+              "maximum": 20000.0,
+              "minimum": 0.0,
+              "title": "Max Distance Km",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "maxLength": 50,
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_score",
+            "required": false,
+            "schema": {
+              "maximum": 100.0,
+              "minimum": 0.0,
+              "title": "Min Score",
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Planning",
         "tags": [
           "API v1"
         ]
@@ -9019,6 +9797,55 @@
           }
         },
         "summary": "Download Document",
+        "tags": [
+          "venues"
+        ]
+      }
+    },
+    "/venues/{venue_id}/documents/{document_id}/preview": {
+      "get": {
+        "operationId": "preview_document_venues__venue_id__documents__document_id__preview_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venue_id",
+            "required": true,
+            "schema": {
+              "title": "Venue Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview Document",
         "tags": [
           "venues"
         ]

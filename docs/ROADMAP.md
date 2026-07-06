@@ -44,6 +44,8 @@ Deliverables:
 
 ## Milestone 05 — Map & Calendar Planning Views
 
+Status: complete
+
 Deliverables:
 
 - Leaflet map view
@@ -51,6 +53,9 @@ Deliverables:
 - clickable opportunity markers/events
 - application deadline display
 - committed operation display
+
+Implementation includes shared date, straight-line distance, status, and profit
+score filters plus explicit missing-coordinate and missing-date warnings.
 
 ## Milestone 06 — Calendar Feeds & Operations Calendar
 

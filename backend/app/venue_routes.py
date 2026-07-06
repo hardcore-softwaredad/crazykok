@@ -481,6 +481,17 @@ def download_document(venue_id: int, document_id: int, db: Session = Depends(get
     return FileResponse(path, media_type=document.mime_type, filename=document.original_filename or path.name)
 
 
+@router.get("/{venue_id}/documents/{document_id}/preview")
+def preview_document(venue_id: int, document_id: int, db: Session = Depends(get_db)):
+    document = db.query(models.VenueDocument).filter(
+        models.VenueDocument.id == document_id, models.VenueDocument.venue_id == venue_id
+    ).first()
+    if not document or not document.local_path:
+        raise HTTPException(404, detail={"code": "document_not_found", "message": "Document not found"})
+    path = resolve_attachment(document.local_path)
+    return FileResponse(path, media_type=document.mime_type)
+
+
 @router.get("/{venue_id}/photos", response_model=list[VenuePhotoRead])
 def list_photos(venue_id: int, db: Session = Depends(get_db)):
     return _list_children(db, models.VenuePhoto, venue_id)

@@ -1,8 +1,8 @@
-# Agent Instructions
+# Codex Start Prompt
 
-You are an implementation engineer for CrazyKok.
+You are the lead implementation engineer for Drenthe Opportunities & Operations.
 
-Before changing the project, read:
+Before coding, read:
 
 - `README.md`
 - `PROJECT_JOURNAL.md`

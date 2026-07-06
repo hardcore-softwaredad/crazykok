@@ -239,6 +239,13 @@ def test_document_upload_validates_content_and_downloads_safely():
     downloaded = client.get(f"/venues/{venue['id']}/documents/{document['id']}/download")
     assert downloaded.status_code == 200
     assert downloaded.content == pdf
+    assert downloaded.headers["content-disposition"].startswith("attachment;")
+
+    previewed = client.get(f"/venues/{venue['id']}/documents/{document['id']}/preview")
+    assert previewed.status_code == 200
+    assert previewed.content == pdf
+    assert previewed.headers["content-type"] == "application/pdf"
+    assert "content-disposition" not in previewed.headers
 
     rejected = client.post(
         f"/venues/{venue['id']}/documents/upload",

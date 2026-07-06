@@ -120,6 +120,10 @@ Suggested fields:
 
 A committed real-world plan to vend at an opportunity.
 
+Milestone 05 implements the relationship, status, commitment date, notes, and
+timestamps needed by planning views. The remaining fields below are deferred to
+the detailed operation workflow milestone.
+
 Suggested fields:
 
 - id

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response
@@ -21,7 +22,15 @@ from .hypermedia import (
 )
 from .opportunity_service import SORT_COLUMNS, filtered_opportunities, ordered_opportunities
 from .openapi_contract import api_docs_origin
-from .schemas import OpportunityCreate, OpportunityRead, OpportunityUpdate
+from .planning_service import planning_opportunities, straight_line_distance_km
+from .schemas import (
+    OperationCreate,
+    OperationRead,
+    OperationUpdate,
+    OpportunityCreate,
+    OpportunityRead,
+    OpportunityUpdate,
+)
 from .venue_schemas import VenueRead
 from .venue_service import venue_to_dict
 
@@ -40,6 +49,7 @@ OpportunitySort = Literal[
     "application_status",
     "expected_revenue",
     "expected_attendance",
+    "profit_score",
 ]
 
 
@@ -55,6 +65,58 @@ class OpportunityEmbedded(HALModel):
 
 class OpportunityCollection(HALCollection):
     embedded: OpportunityEmbedded = Field(alias="_embedded")
+
+
+class OperationHAL(OperationRead):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+    links: dict[str, HALLink] = Field(alias="_links")
+
+
+class OperationEmbedded(HALModel):
+    operations: list[OperationHAL]
+
+
+class OperationCollection(HALCollection):
+    embedded: OperationEmbedded = Field(alias="_embedded")
+
+
+class PlanningVenue(HALModel):
+    id: int
+    name: str
+    latitude: float | None = None
+    longitude: float | None = None
+
+
+class PlanningOperation(HALModel):
+    id: int
+    status: str
+    commitment_date: date | None = None
+    links: dict[str, HALLink] = Field(alias="_links")
+
+
+class PlanningOpportunity(HALModel):
+    id: int
+    name: str
+    event_date: date | None = None
+    application_deadline: date | None = None
+    application_status: str
+    profit_score: float | None = None
+    distance_km: float | None = None
+    venue: PlanningVenue | None = None
+    operations: list[PlanningOperation]
+    links: dict[str, HALLink] = Field(alias="_links")
+
+
+class PlanningWarning(HALModel):
+    code: Literal["missing_coordinates", "missing_date"]
+    opportunity_id: int
+    title: str
+
+
+class PlanningResponse(HALResource):
+    opportunities: list[PlanningOpportunity]
+    warnings: list[PlanningWarning]
 
 
 class OrganizerHAL(HALResource):
@@ -98,6 +160,9 @@ def opportunity_links(request: Request, opportunity: models.Opportunity) -> dict
     }
     if opportunity.venue_id is not None:
         links["venue"] = HALLink(href=api_url(request, f"venues/{opportunity.venue_id}"))
+    links["operations"] = HALLink(
+        href=api_url(request, "operations", [("opportunity_id", opportunity.id)])
+    )
     return links
 
 
@@ -143,6 +208,14 @@ def api_root(request: Request) -> APIRoot:
         links={
             "self": HALLink(href=api_url(request)),
             "opportunities": HALLink(href=api_url(request, "opportunities")),
+            "operations": HALLink(href=api_url(request, "operations")),
+            "planning": HALLink(
+                href=(
+                    f"{api_url(request, 'planning')}"
+                    "{?date_from,date_to,max_distance_km,status,min_score}"
+                ),
+                templated=True,
+            ),
             "opportunity-search": HALLink(
                 href=(
                     f"{api_url(request, 'opportunities')}"
@@ -273,6 +346,166 @@ def delete_opportunity(opportunity_id: DatabaseID, db: Session = Depends(get_db)
     db.delete(record)
     db.commit()
     return Response(status_code=204)
+
+
+def operation_links(request: Request, operation: models.Operation) -> dict[str, HALLink]:
+    return {
+        "self": HALLink(href=api_url(request, f"operations/{operation.id}")),
+        "collection": HALLink(href=api_url(request, "operations")),
+        "opportunity": HALLink(href=api_url(request, f"opportunities/{operation.opportunity_id}")),
+    }
+
+
+def operation_resource(request: Request, operation: models.Operation) -> OperationHAL:
+    data = OperationRead.model_validate(operation).model_dump()
+    return OperationHAL(**data, links=operation_links(request, operation))
+
+
+def get_operation_or_404(db: Session, operation_id: int) -> models.Operation:
+    record = db.query(models.Operation).filter(models.Operation.id == operation_id).first()
+    if record is None:
+        raise HTTPException(status_code=404, detail="Operation not found")
+    return record
+
+
+@router.get("/operations", response_model=OperationCollection, response_model_exclude_none=True, name="api-v1-list-operations")
+def list_operations(
+    request: Request,
+    opportunity_id: int | None = Query(default=None, ge=1, le=2_147_483_647),
+    page: PageNumber = 1,
+    page_size: PageSize = 25,
+    db: Session = Depends(get_db),
+) -> OperationCollection:
+    query = db.query(models.Operation)
+    if opportunity_id is not None:
+        query = query.filter(models.Operation.opportunity_id == opportunity_id)
+    total = query.count()
+    records = query.order_by(models.Operation.id).offset((page - 1) * page_size).limit(page_size).all()
+    page_data = Page(page, page_size, total)
+    query_params: list[tuple[str, str | int | bool]] = []
+    if opportunity_id is not None:
+        query_params.append(("opportunity_id", opportunity_id))
+    query_params.append(("page_size", page_size))
+    return OperationCollection(
+        links=pagination_links(request, "operations", query_params, page_data),
+        page=page_data.metadata(),
+        embedded=OperationEmbedded(
+            operations=[operation_resource(request, record) for record in records]
+        ),
+    )
+
+
+@router.post("/operations", response_model=OperationHAL, response_model_exclude_none=True, status_code=201, name="api-v1-create-operation")
+def create_operation(
+    request: Request,
+    response: Response,
+    operation: OperationCreate,
+    db: Session = Depends(get_db),
+) -> OperationHAL:
+    get_opportunity_or_404(db, operation.opportunity_id)
+    record = models.Operation(**operation.model_dump())
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    resource = operation_resource(request, record)
+    response.headers["Location"] = resource.links["self"].href
+    return resource
+
+
+@router.get("/operations/{operation_id}", response_model=OperationHAL, response_model_exclude_none=True, name="api-v1-get-operation")
+def get_operation(request: Request, operation_id: DatabaseID, db: Session = Depends(get_db)) -> OperationHAL:
+    return operation_resource(request, get_operation_or_404(db, operation_id))
+
+
+@router.patch("/operations/{operation_id}", response_model=OperationHAL, response_model_exclude_none=True, name="api-v1-update-operation")
+def update_operation(
+    request: Request,
+    operation_id: DatabaseID,
+    changes: OperationUpdate,
+    db: Session = Depends(get_db),
+) -> OperationHAL:
+    record = get_operation_or_404(db, operation_id)
+    for field, value in changes.model_dump(exclude_unset=True).items():
+        setattr(record, field, value)
+    db.commit()
+    db.refresh(record)
+    return operation_resource(request, record)
+
+
+@router.get("/planning", response_model=PlanningResponse, response_model_exclude_none=True, name="api-v1-planning")
+def get_planning(
+    request: Request,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    max_distance_km: float | None = Query(default=None, ge=0, le=20_000),
+    status: str | None = Query(default=None, max_length=50),
+    min_score: float | None = Query(default=None, ge=0, le=100),
+    db: Session = Depends(get_db),
+) -> PlanningResponse:
+    records, warnings = planning_opportunities(
+        db,
+        date_from=date_from,
+        date_to=date_to,
+        max_distance_km=max_distance_km,
+        status=status,
+        min_score=min_score,
+    )
+    opportunities = []
+    for record in records:
+        venue = record.venue
+        opportunities.append(
+            PlanningOpportunity(
+                id=record.id,
+                name=record.name,
+                event_date=record.event_date,
+                application_deadline=record.application_deadline,
+                application_status=record.application_status,
+                profit_score=record.profit_score,
+                distance_km=straight_line_distance_km(
+                    venue.latitude if venue else None,
+                    venue.longitude if venue else None,
+                ),
+                venue=(
+                    PlanningVenue(
+                        id=venue.id,
+                        name=venue.venue_name,
+                        latitude=venue.latitude,
+                        longitude=venue.longitude,
+                    )
+                    if venue
+                    else None
+                ),
+                operations=[
+                    PlanningOperation(
+                        id=operation.id,
+                        status=operation.status,
+                        commitment_date=operation.commitment_date,
+                        links=operation_links(request, operation),
+                    )
+                    for operation in record.operations
+                    if status is None or operation.status == status
+                ],
+                links=opportunity_links(request, record),
+            )
+        )
+    self_query: list[tuple[str, str | int | bool]] = []
+    for key, value in (
+        ("date_from", date_from.isoformat() if date_from else None),
+        ("date_to", date_to.isoformat() if date_to else None),
+        ("max_distance_km", str(max_distance_km) if max_distance_km is not None else None),
+        ("status", status),
+        ("min_score", str(min_score) if min_score is not None else None),
+    ):
+        if value is not None:
+            self_query.append((key, value))
+    return PlanningResponse(
+        opportunities=opportunities,
+        warnings=[PlanningWarning(**warning) for warning in warnings],
+        links={
+            "self": HALLink(href=api_url(request, "planning", self_query)),
+            "collection": HALLink(href=api_url(request, "planning")),
+        },
+    )
 
 
 @router.get("/organizers", response_model=OrganizerCollection, response_model_exclude_none=True, name="api-v1-list-organizers")

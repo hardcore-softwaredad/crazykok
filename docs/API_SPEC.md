@@ -114,6 +114,19 @@ Advertise these links only after the resource is implemented.
 
 Advertise these links only after the resource is implemented.
 
+The implemented Milestone 05 subset exposes commitment status, commitment date,
+notes, and the related opportunity. Detailed operation planning fields remain in
+Milestone 07.
+
+### Planning
+
+- `GET /api/v1/planning`
+
+The HAL planning projection joins active opportunities to venues and committed
+operations. It accepts `date_from`, `date_to`, `max_distance_km`, `status`, and
+`min_score`, and returns visible warnings for opportunities missing coordinates
+or dates.
+
 ### Operation Outcomes
 
 - `GET /api/v1/operation-outcomes`

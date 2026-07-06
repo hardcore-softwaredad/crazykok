@@ -7,10 +7,11 @@ mobile food vendor. It brings opportunity research, venue knowledge,
 applications, operational planning, and results into one durable system so the
 business can decide where to trade and learn from what happened.
 
-The current application focuses on opportunity discovery and a reusable venue
-registry, including venue research, CSV import/export, contacts, notes, photos,
-and documents. Applications, committed operations, outcomes, maps, and calendar
-feeds are part of the planned domain described in the [roadmap](docs/ROADMAP.md).
+The current application covers opportunity discovery, a reusable venue registry,
+and map/calendar planning. Venue research includes CSV import/export, contacts,
+notes, photos, and documents; planning combines opportunity locations, application
+deadlines, profit scores, and committed operations. Detailed operation workflows,
+outcomes, and calendar feeds remain on the [roadmap](docs/ROADMAP.md).
 
 ## Public resources
 
@@ -61,7 +62,7 @@ cloud service to run. See [Architecture](docs/ARCHITECTURE.md) and
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | React 18, TypeScript, Vite, Vitest, Testing Library |
+| Frontend | React 18, TypeScript, Vite, Leaflet, FullCalendar, Vitest, Testing Library |
 | Backend | Python 3.13, FastAPI, Pydantic, SQLAlchemy, Alembic, Uvicorn |
 | Data | SQLite by default; filesystem-backed venue attachments |
 | API | Versioned HAL/JSON, RFC 9457 problem details, generated OpenAPI 3.1 |
@@ -150,6 +151,7 @@ change.
 | `DATABASE_URL` | `sqlite:////data/app.db` | SQLAlchemy database connection. |
 | `ATTACHMENT_ROOT` | `/data/attachments` | Venue attachment storage inside the persistent volume. |
 | `MAX_ATTACHMENT_BYTES` | `20971520` | Maximum venue upload size in bytes (20 MiB by default). |
+| `PLANNING_HOME_LATITUDE` / `PLANNING_HOME_LONGITUDE` | Schoonebeek (`52.6627`, `6.8847`) | Origin used for straight-line planning distance filters. |
 | `TRUST_PROXY_HEADERS` | `true` | Build public links from trusted forwarded host, scheme, and prefix headers. |
 | `PUBLIC_API_BASE_URL` | empty | Optional canonical `/v1` API root when proxy-derived links are unsuitable. |
 | `ADR_AUTHORING_ENABLED` | `true` locally | Enables the loopback-only ADR authoring API; always disable in production. |

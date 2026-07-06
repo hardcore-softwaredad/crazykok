@@ -458,6 +458,27 @@ tbody tr:hover {
   font-weight: 400;
 }
 
+.venue-form .field-control:not(.checkbox-label) input,
+.venue-form .field-control select,
+.venue-form .field-control textarea {
+  border-color: transparent;
+  background: transparent;
+}
+
+.venue-form .field-control:not(.checkbox-label) input:hover:not(:disabled),
+.venue-form .field-control select:hover:not(:disabled),
+.venue-form .field-control textarea:hover:not(:disabled) {
+  background: #f7f9fb;
+}
+
+.venue-form .field-control:not(.checkbox-label) input:focus,
+.venue-form .field-control select:focus,
+.venue-form .field-control textarea:focus {
+  border-color: #79aabd;
+  outline: 2px solid #d9edf5;
+  background: #fff;
+}
+
 .related-panel {
   display: grid;
   gap: 10px;
@@ -493,6 +514,13 @@ tbody tr:hover {
 
 .related-card p {
   margin: 4px 0;
+}
+
+.document-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .venue-photo {
@@ -722,6 +750,243 @@ tbody tr:hover {
   color: #63717a;
 }
 
+.planning-shell {
+  min-height: calc(100vh - 53px);
+  padding: 24px;
+  background:
+    radial-gradient(circle at 8% 3%, rgba(242, 193, 78, 0.18), transparent 24rem),
+    #eef1f4;
+}
+
+.planning-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.planning-header h1 {
+  margin: 4px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.planning-header > div > p:last-child {
+  max-width: 680px;
+  margin: 0;
+  color: #52636f;
+}
+
+.view-switcher {
+  display: flex;
+  border: 1px solid #bfcbd1;
+  border-radius: 999px;
+  background: #fff;
+  padding: 4px;
+}
+
+.view-switcher button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 9px 18px;
+  color: #52636f;
+}
+
+.view-switcher button.active {
+  background: #172b26;
+  color: #fff;
+}
+
+.planning-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr)) minmax(105px, 0.6fr) minmax(150px, 1fr) minmax(105px, 0.6fr) auto;
+  align-items: end;
+  gap: 10px;
+  border: 1px solid #d6dfe3;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  padding: 13px;
+  box-shadow: 0 8px 28px rgba(23, 43, 38, 0.06);
+}
+
+.planning-filters label {
+  display: grid;
+  gap: 5px;
+  color: #52636f;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.quiet-action {
+  min-height: 39px;
+  border: 1px solid #cbd5dc;
+  border-radius: 6px;
+  background: transparent;
+  padding: 8px 13px;
+}
+
+.planning-warnings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.planning-warnings p {
+  margin: 0;
+  border: 1px solid #e5c772;
+  border-radius: 7px;
+  background: #fff8df;
+  padding: 8px 11px;
+  color: #715a18;
+  font-size: 0.84rem;
+}
+
+.planning-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.planning-canvas,
+.planning-detail {
+  overflow: hidden;
+  border: 1px solid #d6dfe3;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 36px rgba(23, 43, 38, 0.08);
+}
+
+.planning-canvas {
+  min-height: 620px;
+}
+
+.planning-map {
+  width: 100%;
+  height: 620px;
+  background: #dfe8df;
+}
+
+.marker-detail {
+  display: grid;
+  gap: 3px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+}
+
+.marker-detail span {
+  color: #52636f;
+  font-size: 0.82rem;
+}
+
+.map-empty {
+  padding: 24px;
+  color: #63717a;
+}
+
+.planning-calendar {
+  padding: 18px;
+}
+
+.planning-calendar .fc {
+  --fc-border-color: #dfe5e7;
+  --fc-button-bg-color: #172b26;
+  --fc-button-border-color: #172b26;
+  --fc-button-hover-bg-color: #315047;
+  --fc-button-active-bg-color: #ef7b45;
+  --fc-today-bg-color: rgba(242, 193, 78, 0.15);
+}
+
+.planning-calendar .fc-toolbar-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+}
+
+.planning-calendar .fc-event {
+  cursor: pointer;
+  border: 0;
+  padding: 2px 4px;
+}
+
+.planning-calendar .calendar-opportunity { background: #287271; }
+.planning-calendar .calendar-deadline { background: #d28b1e; }
+.planning-calendar .calendar-operation { background: #d85e32; }
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 14px;
+  color: #52636f;
+  font-size: 0.8rem;
+}
+
+.calendar-legend span::before {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 6px;
+  content: "";
+}
+
+.calendar-legend .opportunity::before { background: #287271; }
+.calendar-legend .deadline::before { background: #d28b1e; }
+.calendar-legend .operation::before { background: #d85e32; }
+
+.planning-detail {
+  align-self: start;
+  padding: 20px;
+}
+
+.planning-detail h2 {
+  margin: 6px 0 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+.planning-detail dl {
+  display: grid;
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+.planning-detail dl > div {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 8px;
+  border-bottom: 1px solid #e7ecee;
+  padding: 9px 0;
+}
+
+.planning-detail dt {
+  color: #687983;
+  font-size: 0.78rem;
+}
+
+.planning-detail dd {
+  margin: 0;
+  font-size: 0.87rem;
+  font-weight: 650;
+  text-align: right;
+}
+
+.detail-link {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
 @media (max-width: 1050px) {
   .topbar,
   .workspace {
@@ -739,6 +1004,14 @@ tbody tr:hover {
 
   .venue-layout {
     grid-template-columns: 1fr;
+  }
+
+  .planning-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .planning-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .venue-list {
@@ -763,7 +1036,17 @@ tbody tr:hover {
 
   .primary-upload,
   .upload-fields,
-  .research-file-options {
+  .research-file-options,
+  .planning-filters {
     grid-template-columns: 1fr;
+  }
+
+  .planning-shell {
+    padding: 14px;
+  }
+
+  .planning-header {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

@@ -15,6 +15,7 @@ SORT_COLUMNS = {
     "application_status": models.Opportunity.application_status,
     "expected_revenue": models.Opportunity.expected_revenue,
     "expected_attendance": models.Opportunity.expected_attendance,
+    "profit_score": models.Opportunity.profit_score,
 }
 
 

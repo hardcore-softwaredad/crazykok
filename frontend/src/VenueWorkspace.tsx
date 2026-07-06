@@ -21,6 +21,16 @@ function valueForInput(value: unknown): string | boolean {
   return value === null || value === undefined ? '' : String(value)
 }
 
+function safeExternalUrl(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null
+  } catch {
+    return null
+  }
+}
+
 function toPayload(form: Record<string, string | boolean>, fields: FieldSpec[]) {
   return Object.fromEntries(
     fields.map((field) => {
@@ -173,8 +183,14 @@ function RelatedPanel({ venue, tab }: { venue: VenueRecord; tab: Exclude<Related
       {items.map((item, index) => (
         <article className="related-card" key={String(item.id ?? index)}>
           {tab === 'photos' && item.local_path ? <img className="venue-photo" src={`${API_BASE}/venues/${venue.id}/photos/${String(item.id)}/content`} alt={String(item.alt_text ?? '')} /> : null}
-          {tab === 'documents' && item.local_path ? <a className="button-link" href={`${API_BASE}/venues/${venue.id}/documents/${String(item.id)}/download`}>Download attachment</a> : null}
-          {Object.entries(item).filter(([key, value]) => !['id', 'venue_id'].includes(key) && value !== null).map(([key, value]) => (
+          {tab === 'documents' && (item.local_path || safeExternalUrl(item.url)) ? (
+            <div className="document-actions">
+              {item.local_path ? <a className="button-link primary-action" href={`${API_BASE}/venues/${venue.id}/documents/${String(item.id)}/preview`} target="_blank" rel="noreferrer">Preview attachment</a> : null}
+              {item.local_path ? <a className="button-link" href={`${API_BASE}/venues/${venue.id}/documents/${String(item.id)}/download`}>Download attachment</a> : null}
+              {safeExternalUrl(item.url) ? <a className="button-link" href={safeExternalUrl(item.url) ?? undefined} target="_blank" rel="noreferrer">Open document link</a> : null}
+            </div>
+          ) : null}
+          {Object.entries(item).filter(([key, value]) => !['id', 'venue_id', 'local_path', 'url'].includes(key) && value !== null).map(([key, value]) => (
             <p key={key}><strong>{key.replace(/_/g, ' ')}:</strong> {String(value)}</p>
           ))}
           {canCreate ? <button className="danger-action" onClick={() => archiveItem(item.id)}>Archive</button> : null}
