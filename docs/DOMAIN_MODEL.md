@@ -9,8 +9,7 @@
 | Venue | Relatively static physical location |
 | Organiser | Entity responsible for running or coordinating an opportunity |
 | Application | The vendor's process of applying for, reserving, or requesting a pitch |
-| Operation | A committed real-world vending plan: "we are going" |
-| Operation Outcome | What actually happened after the operation |
+| Engagement | A committed real-world vending appearance or job |
 | Document | Vendor pack, application PDF, site map, booth layout, rules, etc. |
 | Research Source | Source used to support a researched field |
 | Confidence Rating | Reliability of researched data |
@@ -21,8 +20,7 @@
 ```text
 Opportunity
   -> Application
-  -> Operation
-  -> Operation Outcome
+  -> Engagement
 ```
 
 ## Opportunity
@@ -37,6 +35,9 @@ Examples:
 
 An opportunity may come from an opportunity series, but it must be useful as a standalone planning record.
 
+An opportunity can be attached to a series later. This supports the common case
+where a one-off-looking market or catering lead later proves to be recurring.
+
 ## Opportunity Series
 
 An opportunity series is a repeating or named concept.
@@ -48,6 +49,11 @@ Examples:
 - Emmen Vlindermarkt
 
 A monthly market should not be stored only as one generic row. It should generate individual opportunities.
+
+An opportunity series can also be created from an existing opportunity. For
+example, an imported "Emmen Market, 8 August 2026" opportunity can later be
+promoted into the "Emmen Weekly Market" series and remain linked to its original
+dated opportunity.
 
 ## Venue
 
@@ -76,11 +82,11 @@ Application examples:
 - declined
 - waitlisted
 
-## Operation
+## Engagement
 
-An operation exists when the user commits to actually going.
+An engagement exists when the user commits to actually going.
 
-It tracks planning details such as:
+It tracks planning and actual result details such as:
 
 - assigned pitch
 - setup time
@@ -89,12 +95,6 @@ It tracks planning details such as:
 - vehicle/loading notes
 - equipment checklist
 - prep tasks
-- operational calendar entries
-
-## Operation Outcome
-
-An outcome records actual results:
-
 - revenue
 - costs
 - profit
@@ -106,6 +106,6 @@ An outcome records actual results:
 
 ## Why Separate These?
 
-The same venue may be used every year. The same opportunity series may repeat every year. But each year's opportunity, application, operation, and outcome can differ.
+The same venue may be used every year. The same opportunity series may repeat every year. But each year's opportunity, application, and engagement can differ.
 
 This separation enables year-over-year comparison without duplicating or corrupting static venue information.

@@ -8,7 +8,7 @@ Includes domain model, architecture, ADRs, and milestone prompts.
 
 ## Milestone 02 — Backend Skeleton
 
-Implement the updated opportunity/operation domain model.
+Implement the updated opportunity/engagement domain model.
 
 Deliverables:
 
@@ -28,7 +28,7 @@ Deliverables:
 - opportunity list
 - opportunity detail
 - application status UI
-- operation status UI
+- engagement status UI
 - filters
 - API integration
 
@@ -52,12 +52,12 @@ Deliverables:
 - FullCalendar planning view
 - clickable opportunity markers/events
 - application deadline display
-- committed operation display
+- committed engagement display
 
 Implementation includes shared date, straight-line distance, status, and profit
 score filters plus explicit missing-coordinate and missing-date warnings.
 
-## Milestone 06 — Calendar Feeds & Operations Calendar
+## Milestone 06 — Calendar Feeds & Engagements Calendar
 
 Deliverables:
 
@@ -65,20 +65,27 @@ Deliverables:
 - subscribable Apple/Google/Outlook calendar feeds
 - all opportunities feed
 - filtered opportunities feeds
-- committed operations feed
+- committed engagements feed
 - application deadlines feed
-- operation tasks feed
+- engagement tasks feed
 
-## Milestone 07 — Operations & Outcomes
+## Milestone 07 — Engagements & Results
+
+Status: complete
 
 Deliverables:
 
-- operation planning
+- engagement planning
 - setup/teardown details
 - staffing/equipment notes
-- operation outcomes
+- engagement actuals
 - year-over-year comparisons
 - revenue/cost/profit tracking
+
+Implementation includes normalized opportunity-series assignment, opportunity
+actions to create/attach/detach series, detailed setup/teardown and operational
+notes, inline engagement actuals, server-derived profit, and year-over-year
+comparisons by series, venue, organizer, and municipality.
 
 ## Milestone 08 — HATEOAS API Navigation
 

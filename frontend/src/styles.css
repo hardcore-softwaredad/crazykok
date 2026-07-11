@@ -213,6 +213,56 @@ th button {
   align-items: start;
 }
 
+.operations-shell .editor-panel {
+  max-height: calc(100vh - 130px);
+  overflow: auto;
+}
+
+.outcome-form {
+  margin-top: 24px;
+  border-top: 1px solid #dbe2e8;
+  padding-top: 16px;
+}
+
+.series-tools {
+  background: rgba(23, 43, 38, 0.04);
+  border: 1px solid #dbe2e8;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.calculated-profit {
+  border-radius: 6px;
+  background: #e9f4ef;
+  padding: 10px;
+  color: #21623f;
+  font-weight: 700;
+}
+
+.comparison-panel {
+  border-top: 1px solid #dbe2e8;
+  padding: 16px;
+}
+
+.comparison-panel select {
+  width: auto;
+}
+
+.comparison-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #edf0f2;
+  padding: 9px 0;
+}
+
 .table-panel,
 .editor-panel,
 .notice {
@@ -919,7 +969,7 @@ tbody tr:hover {
 
 .planning-calendar .calendar-opportunity { background: #287271; }
 .planning-calendar .calendar-deadline { background: #d28b1e; }
-.planning-calendar .calendar-operation { background: #d85e32; }
+.planning-calendar .calendar-engagement { background: #d85e32; }
 
 .calendar-legend {
   display: flex;
@@ -941,7 +991,7 @@ tbody tr:hover {
 
 .calendar-legend .opportunity::before { background: #287271; }
 .calendar-legend .deadline::before { background: #d28b1e; }
-.calendar-legend .operation::before { background: #d85e32; }
+.calendar-legend .engagement::before { background: #d85e32; }
 
 .planning-detail {
   align-self: start;

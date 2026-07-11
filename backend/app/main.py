@@ -13,7 +13,7 @@ from .adr_routes import router as adr_router
 from .api_v1 import router as api_v1_router
 from .database import get_db
 from .hypermedia import ProblemJSONResponse, api_url
-from .opportunity_service import filtered_opportunities, ordered_opportunities
+from .opportunity_service import apply_opportunity_values, filtered_opportunities, ordered_opportunities
 from .openapi_contract import api_docs_origin, router as openapi_contract_router
 from .schemas import EventCreate, EventRead, EventUpdate, OrganizerRead
 from .venue_routes import import_router as venue_import_router
@@ -144,7 +144,8 @@ def list_events(
 @app.post("/events", response_model=EventRead, status_code=201, deprecated=True)
 @app.post("/opportunities", response_model=EventRead, status_code=201, deprecated=True)
 def create_event(event: EventCreate, db: Session = Depends(get_db)):
-    db_event = models.Event(**event.model_dump())
+    db_event = models.Event()
+    apply_opportunity_values(db, db_event, event.model_dump())
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
@@ -167,8 +168,7 @@ def update_event(event_id: int, event_update: EventUpdate, db: Session = Depends
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    for field, value in event_update.model_dump(exclude_unset=True).items():
-        setattr(event, field, value)
+    apply_opportunity_values(db, event, event_update.model_dump(exclude_unset=True))
 
     db.commit()
     db.refresh(event)

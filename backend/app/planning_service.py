@@ -38,7 +38,7 @@ def planning_opportunities(
 ) -> tuple[list[models.Opportunity], list[dict[str, int | str]]]:
     query = (
         db.query(models.Opportunity)
-        .options(joinedload(models.Opportunity.venue), joinedload(models.Opportunity.operations))
+        .options(joinedload(models.Opportunity.venue), joinedload(models.Opportunity.engagements))
         .filter(models.Opportunity.is_active.is_(True))
     )
     if min_score is not None:
@@ -49,7 +49,7 @@ def planning_opportunities(
     selected: list[models.Opportunity] = []
     for opportunity in candidates:
         status_matches = status is None or opportunity.application_status == status or any(
-            operation.status == status for operation in opportunity.operations
+            engagement.status == status for engagement in opportunity.engagements
         )
         if not status_matches:
             continue

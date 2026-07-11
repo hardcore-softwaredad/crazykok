@@ -13,9 +13,43 @@ test('@smoke loads every core workspace through primary navigation', async ({ pa
   await expect(page.getByRole('heading', { name: 'Map & calendar' })).toBeVisible()
   await expect(page.getByLabel('Planning filters')).toBeVisible()
 
+  await page.getByRole('button', { name: 'Engagements' }).click()
+  await expect(page.getByRole('heading', { name: 'Engagements' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'New engagement' })).toBeVisible()
+
   await page.getByRole('button', { name: 'Import venues' }).click()
   await expect(page.getByRole('heading', { name: 'Venue research import' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Download complete research kit' })).toBeVisible()
+})
+
+test('plans an engagement and records its actuals', async ({ page }) => {
+  const suffix = Date.now()
+  const name = `E2E Engagement ${suffix}`
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Opportunities' }).click()
+  await page.getByPlaceholder('Search').fill(name)
+  await page.getByRole('button', { name: 'New opportunity' }).click()
+  await page.getByLabel('Opportunity name').fill(name)
+  await page.getByLabel('Opportunity date').fill('2026-10-04')
+  await page.getByRole('button', { name: 'Save opportunity' }).click()
+
+  await page.getByRole('button', { name: 'Engagements' }).click()
+  await page.getByRole('button', { name: 'New engagement' }).click()
+  await page.getByLabel('Opportunity').selectOption({ label: `${name} — 2026-10-04` })
+  await page.getByLabel('Pitch number').fill('B-12')
+  await page.getByLabel('Setup starts').fill('2026-10-04T08:00')
+  await page.getByLabel('Setup ends').fill('2026-10-04T09:00')
+  await page.getByLabel('staffing notes').fill('Two people')
+  await page.getByRole('button', { name: 'Save engagement' }).click()
+
+  await expect(page.getByRole('row', { name: new RegExp(name) })).toContainText('B-12')
+  await page.getByLabel('Status').selectOption('completed')
+  await page.getByLabel('Revenue €').fill('1200.50')
+  await page.getByLabel('Costs €').fill('350.25')
+  await page.getByLabel('Rating').selectOption('5')
+  await expect(page.getByText('Calculated profit: €850.25')).toBeVisible()
+  await page.getByRole('button', { name: 'Save engagement' }).click()
+  await expect(page.getByRole('row', { name: new RegExp(name) })).toContainText('€850.25')
 })
 
 test('creates, edits, archives, restores, and deletes an opportunity', async ({ page }) => {
@@ -24,6 +58,7 @@ test('creates, edits, archives, restores, and deletes an opportunity', async ({ 
 
   await page.goto('/')
   await page.getByRole('button', { name: 'Opportunities' }).click()
+  await page.getByPlaceholder('Search').fill(name)
   await page.getByRole('button', { name: 'New opportunity' }).click()
 
   await page.getByLabel('Opportunity name').fill(name)

@@ -6,6 +6,26 @@ from sqlalchemy.orm import Query, Session
 from . import models
 
 
+def apply_opportunity_values(db: Session, opportunity: models.Opportunity, values: dict) -> None:
+    series_name = values.pop("series_name", None) if "series_name" in values else ...
+    if series_name is not ...:
+        cleaned = series_name.strip() if series_name else None
+        if cleaned:
+            series = (
+                db.query(models.OpportunitySeries)
+                .filter(models.OpportunitySeries.name == cleaned)
+                .first()
+            )
+            if series is None:
+                series = models.OpportunitySeries(name=cleaned)
+                db.add(series)
+            opportunity.series = series
+        else:
+            opportunity.series = None
+    for field, value in values.items():
+        setattr(opportunity, field, value)
+
+
 SORT_COLUMNS = {
     "event_date": models.Opportunity.event_date,
     "application_deadline": models.Opportunity.application_deadline,
@@ -28,6 +48,7 @@ def filtered_opportunities(
     location: str | None = None,
     organizer: str | None = None,
     venue_id: int | None = None,
+    series_id: int | None = None,
     active: bool | None = True,
 ) -> Query:
     query = db.query(models.Opportunity)
@@ -50,6 +71,8 @@ def filtered_opportunities(
         query = query.filter(models.Opportunity.organizer == organizer)
     if venue_id is not None:
         query = query.filter(models.Opportunity.venue_id == venue_id)
+    if series_id is not None:
+        query = query.filter(models.Opportunity.opportunity_series_id == series_id)
     if active is not None:
         query = query.filter(models.Opportunity.is_active == active)
     return query

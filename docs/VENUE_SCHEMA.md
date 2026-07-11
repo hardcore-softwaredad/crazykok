@@ -10,8 +10,8 @@ Venues should not store derived analytics such as average revenue, average profi
 
 - Venues are mostly static.
 - Opportunities reference venues.
-- Operations reference opportunities.
-- Operation outcomes provide facts for later analytics.
+- Engagements reference opportunities.
+- Engagement actuals provide facts for later analytics.
 - Venue data should support planning, import/export, research, and deduplication.
 - Unknown values should remain explicit rather than guessed.
 
@@ -99,7 +99,6 @@ Analytics should be derived later from:
 
 - opportunities
 - applications
-- operations
-- operation outcomes
+- engagements
 
 A future observability/OLAP layer can use views, denormalized tables, DuckDB, or another analytical store.

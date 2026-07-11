@@ -36,7 +36,7 @@ or link relation:
    it; by default it compares the generated candidate with the baseline in
    `HEAD`, so regenerating the working file cannot hide a breaking change;
 4. run `scripts/run_api_fitness.sh` against an ephemeral or local test API; and
-5. verify the operation and its live HAL links in the interactive reference.
+5. verify the engagement and its live HAL links in the interactive reference.
 
 These gates answer different questions: drift checks whether code and the
 reviewed artifact agree, oasdiff checks client compatibility, and Schemathesis

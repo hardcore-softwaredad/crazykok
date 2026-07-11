@@ -23,7 +23,7 @@ def venue_payload(external_id: str, name: str, **overrides):
     }
 
 
-def test_planning_combines_map_calendar_deadline_and_committed_operation():
+def test_planning_combines_map_calendar_deadline_and_committed_engagement():
     venue_response = client.post(
         "/venues",
         json=venue_payload("VEN-NL-DR-ASSEN-PLANNING", "Mapped square", latitude=52.9928, longitude=6.5642),
@@ -42,18 +42,18 @@ def test_planning_combines_map_calendar_deadline_and_committed_operation():
             "venue_id": venue["id"],
         },
     ).json()
-    operation_response = client.post(
-        "/v1/operations",
+    engagement_response = client.post(
+        "/v1/engagements",
         headers=HAL,
         json={"opportunity_id": opportunity["id"], "status": "committed", "commitment_date": "2026-07-05"},
     )
-    assert operation_response.status_code == 201
-    operation = operation_response.json()
-    assert operation["_links"]["opportunity"]["href"] == opportunity["_links"]["self"]["href"]
+    assert engagement_response.status_code == 201
+    engagement = engagement_response.json()
+    assert engagement["_links"]["opportunity"]["href"] == opportunity["_links"]["self"]["href"]
     collection = client.get(
-        f"/v1/operations?opportunity_id={opportunity['id']}", headers=HAL
+        f"/v1/engagements?opportunity_id={opportunity['id']}", headers=HAL
     ).json()
-    assert collection["_embedded"]["operations"][0]["id"] == operation["id"]
+    assert collection["_embedded"]["engagements"][0]["id"] == engagement["id"]
     assert collection["page"]["total_elements"] == 1
 
     response = client.get(
@@ -65,7 +65,7 @@ def test_planning_combines_map_calendar_deadline_and_committed_operation():
     assert result["venue"]["latitude"] == 52.9928
     assert 30 < result["distance_km"] < 60
     assert result["profit_score"] == 82
-    assert result["operations"][0]["id"] == operation["id"]
+    assert result["engagements"][0]["id"] == engagement["id"]
 
     excluded = client.get("/v1/planning?min_score=90", headers=HAL)
     assert all(item["id"] != opportunity["id"] for item in excluded.json()["opportunities"])
@@ -87,15 +87,15 @@ def test_planning_reports_missing_coordinates_and_dates_and_handles_empty_range(
     assert invalid.json()["opportunities"] == []
 
 
-def test_operation_rejects_unknown_opportunity_and_can_be_updated():
-    missing = client.post("/v1/operations", headers=HAL, json={"opportunity_id": 999999})
+def test_engagement_rejects_unknown_opportunity_and_can_be_updated():
+    missing = client.post("/v1/engagements", headers=HAL, json={"opportunity_id": 999999})
     assert missing.status_code == 404
 
     opportunity = client.post(
-        "/v1/opportunities", headers=HAL, json={"name": "Operation lifecycle"}
+        "/v1/opportunities", headers=HAL, json={"name": "Engagement lifecycle"}
     ).json()
     created = client.post(
-        "/v1/operations", headers=HAL, json={"opportunity_id": opportunity["id"]}
+        "/v1/engagements", headers=HAL, json={"opportunity_id": opportunity["id"]}
     ).json()
     updated = client.patch(
         created["_links"]["self"]["href"], headers=HAL, json={"status": "cancelled"}

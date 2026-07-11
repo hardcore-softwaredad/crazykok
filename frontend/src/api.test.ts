@@ -32,6 +32,7 @@ test('discovers search and follows the returned resource self link', async () =>
     expected_attendance: null,
     is_active: true,
     venue_id: null,
+    series_name: null,
     _links: {
       self: { href: 'https://api.example.test/v1/opportunities/by-stable-link' },
       collection: { href: 'https://api.example.test/v1/opportunities' },

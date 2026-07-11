@@ -1,6 +1,6 @@
 # Codex Prompt — Implement Comprehensive Venue Schema
 
-You are implementing the venue schema for Drenthe Opportunities & Operations.
+You are implementing the venue schema for Drenthe Opportunities & Engagements.
 
 ## Read First
 

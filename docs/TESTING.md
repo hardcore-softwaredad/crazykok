@@ -26,7 +26,8 @@ The core journeys cover:
 
 - loading every primary workspace;
 - creating, editing, archiving, restoring, and deleting an opportunity;
-- creating, editing, and archiving a venue; and
+- creating, editing, and archiving a venue;
+- planning an engagement and recording its actuals; and
 - previewing and applying a reviewed venue CSV import.
 
 Screenshots, video, traces, and the HTML report are retained on failure and are

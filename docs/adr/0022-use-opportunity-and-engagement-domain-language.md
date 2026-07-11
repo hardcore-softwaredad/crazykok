@@ -1,14 +1,14 @@
 ---
 schema_version: 1
 id: '0022'
-slug: use-opportunity-and-operation-domain-language
-title: Use Opportunity And Operation Domain Language
+slug: use-opportunity-and-engagement-domain-language
+title: Use Opportunity And Engagement Domain Language
 status: accepted
 date: '2026-07-03'
 category: domain
 tags:
   - application
-  - operation
+  - engagement
   - opportunity
 keywords:
   - domain language
@@ -18,7 +18,7 @@ supersedes: []
 superseded_by: []
 ---
 
-# ADR 0022: Use Opportunity And Operation Domain Language
+# ADR 0022: Use Opportunity And Engagement Domain Language
 
 
 ## Context
@@ -27,12 +27,11 @@ The terms event and trading are ambiguous. The product needs cleaner domain lang
 
 ## Decision
 
-Use Opportunity, Application, Operation, Operation Outcome, and Calendar Feed as core terms.
+Use Opportunity, Application, Engagement, and Calendar Feed as core terms.
 
 - Opportunity: a possible vending opportunity.
 - Application: the process of applying or reserving.
-- Operation: a committed real-world plan to attend.
-- Operation Outcome: the actual results after attending.
+- Engagement: a committed real-world appearance or job, including planning details and actual results after attending.
 
 ## Consequences
 

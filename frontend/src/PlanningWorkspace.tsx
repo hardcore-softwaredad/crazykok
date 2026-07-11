@@ -16,7 +16,7 @@ type Filters = {
 
 type Selection =
   | { kind: 'opportunity' | 'deadline'; opportunity: PlanningOpportunity }
-  | { kind: 'operation'; opportunity: PlanningOpportunity; operationId: number }
+  | { kind: 'engagement'; opportunity: PlanningOpportunity; engagementId: number }
 
 const emptyFilters: Filters = { dateFrom: '', dateTo: '', maxDistance: '', status: '', minScore: '' }
 
@@ -97,15 +97,15 @@ export default function PlanningWorkspace() {
           extendedProps: { kind: 'deadline', opportunity },
         })
       }
-      opportunity.operations.forEach((operation) => {
+      opportunity.engagements.forEach((engagement) => {
         if (!opportunity.event_date) return
         events.push({
-          id: `operation-${operation.id}`,
+          id: `engagement-${engagement.id}`,
           title: `Committed · ${opportunity.name}`,
           start: opportunity.event_date,
           allDay: true,
-          classNames: ['calendar-operation'],
-          extendedProps: { kind: 'operation', opportunity, operationId: operation.id },
+          classNames: ['calendar-engagement'],
+          extendedProps: { kind: 'engagement', opportunity, engagementId: engagement.id },
         })
       })
       return events
@@ -116,8 +116,8 @@ export default function PlanningWorkspace() {
   const initialDate = calendarEvents[0]?.start
   const missingCoordinates = warnings.filter((warning) => warning.code === 'missing_coordinates')
   const missingDates = warnings.filter((warning) => warning.code === 'missing_date')
-  const selectedOperation = selection?.kind === 'operation'
-    ? selection.opportunity.operations.find((operation) => operation.id === selection.operationId)
+  const selectedEngagement = selection?.kind === 'engagement'
+    ? selection.opportunity.engagements.find((engagement) => engagement.id === selection.engagementId)
     : null
 
   return (
@@ -164,7 +164,7 @@ export default function PlanningWorkspace() {
               key={opportunity.id}
               center={[opportunity.venue!.latitude!, opportunity.venue!.longitude!]}
               radius={9}
-              pathOptions={{ color: '#172b26', fillColor: opportunity.operations.length ? '#ef7b45' : '#f2c14e', fillOpacity: 0.9 }}
+              pathOptions={{ color: '#172b26', fillColor: opportunity.engagements.length ? '#ef7b45' : '#f2c14e', fillOpacity: 0.9 }}
               eventHandlers={{ click: () => setSelection({ kind: 'opportunity', opportunity }) }}
             ><Popup><button className="marker-detail" onClick={() => setSelection({ kind: 'opportunity', opportunity })}><strong>{opportunity.name}</strong><span>{opportunity.venue?.name}</span><span>{opportunity.distance_km} km · score {opportunity.profit_score ?? '—'}</span></button></Popup></CircleMarker>)}
           </MapContainer> : null}
@@ -178,7 +178,7 @@ export default function PlanningWorkspace() {
               eventClick={(info) => setSelection(info.event.extendedProps as Selection)}
               height="auto"
             />
-            <div className="calendar-legend"><span className="opportunity">Opportunity</span><span className="deadline">Application deadline</span><span className="operation">Committed operation</span></div>
+            <div className="calendar-legend"><span className="opportunity">Opportunity</span><span className="deadline">Application deadline</span><span className="engagement">Committed engagement</span></div>
           </div> : null}
         </section>
 
@@ -192,10 +192,10 @@ export default function PlanningWorkspace() {
               <div><dt>Venue</dt><dd>{selection.opportunity.venue?.name ?? 'No venue linked'}</dd></div>
               <div><dt>Distance</dt><dd>{selection.opportunity.distance_km != null ? `${selection.opportunity.distance_km} km straight-line` : 'Unknown'}</dd></div>
               <div><dt>Score</dt><dd>{selection.opportunity.profit_score ?? 'Not scored'}</dd></div>
-              <div><dt>Status</dt><dd>{selectedOperation?.status ?? selection.opportunity.application_status}</dd></div>
+              <div><dt>Status</dt><dd>{selectedEngagement?.status ?? selection.opportunity.application_status}</dd></div>
             </dl>
-            <a className="primary-action detail-link" href={selectedOperation?._links.self.href ?? selection.opportunity._links.self.href}>Open {selection.kind === 'operation' ? 'operation' : 'opportunity'} detail</a>
-          </> : <div className="empty-state"><strong>Pick a marker or calendar entry</strong><p>Its opportunity or operation detail will appear here.</p></div>}
+            <a className="primary-action detail-link" href={selectedEngagement?._links.self.href ?? selection.opportunity._links.self.href}>Open {selection.kind === 'engagement' ? 'engagement' : 'opportunity'} detail</a>
+          </> : <div className="empty-state"><strong>Pick a marker or calendar entry</strong><p>Its opportunity or engagement detail will appear here.</p></div>}
         </aside>
       </main>
     </div>

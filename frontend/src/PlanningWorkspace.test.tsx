@@ -34,11 +34,11 @@ const opportunity = {
   profit_score: 84,
   distance_km: 31.4,
   venue: { id: 3, name: 'Market square', latitude: 52.9, longitude: 6.5 },
-  operations: [{
+  engagements: [{
     id: 11,
     status: 'committed',
     commitment_date: '2026-07-05',
-    _links: { self: { href: 'http://localhost/api/v1/operations/11' } },
+    _links: { self: { href: 'http://localhost/api/v1/engagements/11' } },
   }],
   _links: { self: { href: 'http://localhost/api/v1/opportunities/7' } },
 }
@@ -67,16 +67,16 @@ describe('PlanningWorkspace', () => {
     await waitFor(() => expect(findPlanning).toHaveBeenLastCalledWith(expect.objectContaining({ max_distance_km: '40' })))
   })
 
-  it('renders deadlines and committed operations in the calendar with operation click-through', async () => {
+  it('renders deadlines and committed engagements in the calendar with engagement click-through', async () => {
     render(<PlanningWorkspace />)
     await screen.findByTestId('map')
     fireEvent.click(screen.getByRole('button', { name: 'Calendar' }))
 
     expect(screen.getByRole('button', { name: 'Deadline · Summer market' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Committed · Summer market' }))
-    expect(screen.getByRole('link', { name: 'Open operation detail' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Open engagement detail' })).toHaveAttribute(
       'href',
-      'http://localhost/api/v1/operations/11',
+      'http://localhost/api/v1/engagements/11',
     )
   })
 })

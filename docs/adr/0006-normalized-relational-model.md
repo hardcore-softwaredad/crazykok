@@ -25,7 +25,7 @@ This project is a private, local-first operating system for discovering opportun
 
 ## Decision
 
-Separate opportunity series, opportunities, venues, organisers, applications, operations, outcomes, documents, and sources.
+Separate opportunity series, opportunities, venues, organisers, applications, engagements, documents, and sources.
 
 ## Consequences
 

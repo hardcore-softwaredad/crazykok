@@ -7,11 +7,28 @@ mobile food vendor. It brings opportunity research, venue knowledge,
 applications, operational planning, and results into one durable system so the
 business can decide where to trade and learn from what happened.
 
-The current application covers opportunity discovery, a reusable venue registry,
-and map/calendar planning. Venue research includes CSV import/export, contacts,
-notes, photos, and documents; planning combines opportunity locations, application
-deadlines, profit scores, and committed operations. Detailed operation workflows,
-outcomes, and calendar feeds remain on the [roadmap](docs/ROADMAP.md).
+The current application covers opportunity discovery, opportunity series,
+engagement planning, a reusable venue registry, and map/calendar planning. Venue
+research includes CSV import/export, contacts, notes, photos, and documents;
+planning combines opportunity locations, application deadlines, profit scores,
+and committed engagements. The engagements workspace captures setup, staffing,
+equipment, actual revenue and costs, qualitative notes, and year-over-year
+comparisons. Calendar feeds remain on the [roadmap](docs/ROADMAP.md).
+
+In business terms, an opportunity is a possible chance to work on a particular
+date or date range, while an engagement is the work CrazyKok has actually
+committed to doing. A recurring market such as the Emmen weekly market can be
+stored as an opportunity series, with each Saturday market represented by its
+own dated opportunity underneath it; when CrazyKok decides to attend one of
+those Saturdays, that commitment becomes an engagement with pitch, setup,
+staffing, revenue, costs, and lessons learned on the same record.
+
+One-off work fits the same model without forcing it to become recurring. A
+wedding reception or office party can start as a single opportunity and become a
+single engagement when accepted. If that customer later becomes repeat business,
+the opportunity can be attached to a new or existing opportunity series from the
+opportunity screen, letting the history grow naturally instead of depending on
+everything being known at import time.
 
 ## Public resources
 
@@ -79,7 +96,7 @@ cloud service to run. See [Architecture](docs/ARCHITECTURE.md) and
 
 | Module | Responsibility | Key decisions |
 | --- | --- | --- |
-| [`frontend/`](frontend/) | Opportunity and venue workspaces, imports, and the generated decision-log UI. | [React and TypeScript](docs/adr/0005-react-typescript-frontend.md), [map and calendar tools](docs/adr/0021-map-and-calendar-planning-tools.md) |
+| [`frontend/`](frontend/) | Opportunity, series, venue, planning, engagement, import, and generated decision-log workspaces. | [React and TypeScript](docs/adr/0005-react-typescript-frontend.md), [map and calendar tools](docs/adr/0021-map-and-calendar-planning-tools.md) |
 | [`backend/app/`](backend/app/) | HTTP routes, services, domain models, HAL links, uploads, and public contract generation. | [FastAPI](docs/adr/0004-fastapi-backend.md), [thin routes and services](docs/adr/0015-thin-routes-services.md), [HAL navigation](docs/adr/0028-use-hal-for-versioned-api-navigation.md) |
 | [`backend/alembic/`](backend/alembic/) | Versioned relational database migrations. | [normalized model](docs/adr/0006-normalized-relational-model.md), [Alembic migrations](docs/adr/0014-alembic-migrations.md) |
 | [`docker/`](docker/) and [`docker-compose.yml`](docker-compose.yml) | Reproducible service images, TLS gateway, virtual hosts, and persistent storage wiring. | [local-first application](docs/adr/0002-local-first-application.md), [private portable tool](docs/adr/0020-private-portable-tool.md) |
@@ -91,7 +108,7 @@ cloud service to run. See [Architecture](docs/ARCHITECTURE.md) and
 The main business entities and their boundaries are defined in the
 [Domain Model](docs/DOMAIN_MODEL.md). Particularly relevant decisions are
 [opportunity occurrences](docs/adr/0007-opportunity-occurrences.md),
-[opportunities versus operations](docs/adr/0023-separate-opportunities-from-operations.md),
+[opportunities versus engagements](docs/adr/0023-separate-opportunities-from-engagements.md),
 [venue management](docs/adr/0026-venue-management.md), and
 [local venue attachments](docs/adr/0029-store-venue-attachments-in-local-application-data.md).
 
@@ -219,8 +236,8 @@ Start with these documents:
 5. [AI agent instructions](docs/AI_INSTRUCTIONS.md), when working with a coding agent
 
 Use the project language—Opportunity, Opportunity Series, Application,
-Operation, Operation Outcome, and Calendar Feed—rather than the old
-event/trading terminology. Architectural changes require an ADR, and ADR files
+Engagement, and Calendar Feed—rather than the old event/trading terminology.
+Architectural changes require an ADR, and ADR files
 must be created or updated through the local authoring API described in the
 authoring rules.
 

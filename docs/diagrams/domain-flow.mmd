@@ -3,8 +3,7 @@ flowchart LR
     Venue[Venue] --> Opp
     Organiser[Organiser] --> Opp
     Opp --> App[Application]
-    App --> Op[Operation]
-    Opp --> Op
-    Op --> Outcome[Operation Outcome]
+    App --> Eng[Engagement]
+    Opp --> Eng
     Opp --> Feeds[Calendar Feeds]
-    Op --> Feeds
+    Eng --> Feeds

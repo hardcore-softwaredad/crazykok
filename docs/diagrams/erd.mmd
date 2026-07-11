@@ -4,15 +4,14 @@ erDiagram
     ORGANISERS ||--o{ OPPORTUNITIES : coordinates
     VENUES ||--o{ OPPORTUNITIES : hosts
     OPPORTUNITIES ||--o{ APPLICATIONS : has
-    OPPORTUNITIES ||--o{ OPERATIONS : may_become
-    APPLICATIONS ||--o{ OPERATIONS : may_result_in
-    OPERATIONS ||--o{ OPERATION_OUTCOMES : records
+    OPPORTUNITIES ||--o{ ENGAGEMENTS : may_become
+    APPLICATIONS ||--o{ ENGAGEMENTS : may_result_in
     OPPORTUNITIES ||--o{ UTILITIES : offers
     OPPORTUNITIES ||--o{ DOCUMENTS : references
-    OPERATIONS ||--o{ DOCUMENTS : uses
+    ENGAGEMENTS ||--o{ DOCUMENTS : uses
     RESEARCH_SOURCES ||--o{ DOCUMENTS : supports
     CALENDAR_FEEDS }o--o{ OPPORTUNITIES : can_include
-    CALENDAR_FEEDS }o--o{ OPERATIONS : can_include
+    CALENDAR_FEEDS }o--o{ ENGAGEMENTS : can_include
 
     OPPORTUNITY_SERIES {
         int id PK
@@ -53,7 +52,7 @@ erDiagram
         string pitch_number
     }
 
-    OPERATIONS {
+    ENGAGEMENTS {
         int id PK
         int opportunity_id FK
         int application_id FK
@@ -61,11 +60,6 @@ erDiagram
         datetime setup_start_at
         datetime teardown_end_at
         string pitch_number
-    }
-
-    OPERATION_OUTCOMES {
-        int id PK
-        int operation_id FK
         bool attended
         float revenue_eur
         float costs_eur

@@ -177,6 +177,105 @@
         "title": "Body_upload_photo_venues__venue_id__photos_upload_post",
         "type": "object"
       },
+      "ComparisonGroup": {
+        "properties": {
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "years": {
+            "items": {
+              "$ref": "#/components/schemas/ComparisonYear"
+            },
+            "title": "Years",
+            "type": "array"
+          }
+        },
+        "required": [
+          "group",
+          "years"
+        ],
+        "title": "ComparisonGroup",
+        "type": "object"
+      },
+      "ComparisonResponse": {
+        "properties": {
+          "_links": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/HALLink"
+                },
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/HALLink"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "group_by": {
+            "enum": [
+              "series",
+              "venue",
+              "organizer",
+              "municipality"
+            ],
+            "title": "Group By",
+            "type": "string"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/ComparisonGroup"
+            },
+            "title": "Groups",
+            "type": "array"
+          }
+        },
+        "required": [
+          "_links",
+          "group_by",
+          "groups"
+        ],
+        "title": "ComparisonResponse",
+        "type": "object"
+      },
+      "ComparisonYear": {
+        "properties": {
+          "costs_eur": {
+            "title": "Costs Eur",
+            "type": "string"
+          },
+          "engagement_count": {
+            "title": "Engagement Count",
+            "type": "integer"
+          },
+          "profit_eur": {
+            "title": "Profit Eur",
+            "type": "string"
+          },
+          "revenue_eur": {
+            "title": "Revenue Eur",
+            "type": "string"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "year",
+          "engagement_count",
+          "revenue_eur",
+          "costs_eur",
+          "profit_eur"
+        ],
+        "title": "ComparisonYear",
+        "type": "object"
+      },
       "DuplicateCheckRequest": {
         "properties": {
           "latitude": {
@@ -277,6 +376,913 @@
           "venue_name"
         ],
         "title": "DuplicateCheckRequest",
+        "type": "object"
+      },
+      "EngagementCollection": {
+        "properties": {
+          "_embedded": {
+            "$ref": "#/components/schemas/EngagementEmbedded"
+          },
+          "_links": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HALLink"
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        },
+        "required": [
+          "_links",
+          "page",
+          "_embedded"
+        ],
+        "title": "EngagementCollection",
+        "type": "object"
+      },
+      "EngagementCreate": {
+        "properties": {
+          "arrival_plan": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arrival Plan"
+          },
+          "attend_again": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attend Again"
+          },
+          "attended": {
+            "default": true,
+            "title": "Attended",
+            "type": "boolean"
+          },
+          "best_selling_items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Selling Items"
+          },
+          "calendar_visibility": {
+            "default": true,
+            "title": "Calendar Visibility",
+            "type": "boolean"
+          },
+          "commitment_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Date"
+          },
+          "costs_eur": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "default": "0",
+            "title": "Costs Eur"
+          },
+          "customer_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Notes"
+          },
+          "equipment_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equipment Notes"
+          },
+          "inventory_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inventory Notes"
+          },
+          "lessons_learned": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lessons Learned"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "operational_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operational Notes"
+          },
+          "opportunity_id": {
+            "maximum": 2147483647.0,
+            "minimum": 1.0,
+            "title": "Opportunity Id",
+            "type": "integer"
+          },
+          "pitch_number": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pitch Number"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "maximum": 5.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "revenue_eur": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "default": "0",
+            "title": "Revenue Eur"
+          },
+          "setup_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup End At"
+          },
+          "setup_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Start At"
+          },
+          "staffing_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staffing Notes"
+          },
+          "status": {
+            "default": "committed",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Status",
+            "type": "string"
+          },
+          "teardown_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Teardown End At"
+          },
+          "teardown_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Teardown Start At"
+          },
+          "travel_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Travel Notes"
+          },
+          "weather_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weather Notes"
+          }
+        },
+        "required": [
+          "opportunity_id"
+        ],
+        "title": "EngagementCreate",
+        "type": "object"
+      },
+      "EngagementEmbedded": {
+        "properties": {
+          "engagements": {
+            "items": {
+              "$ref": "#/components/schemas/EngagementHAL"
+            },
+            "title": "Engagements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "engagements"
+        ],
+        "title": "EngagementEmbedded",
+        "type": "object"
+      },
+      "EngagementHAL": {
+        "properties": {
+          "_links": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HALLink"
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "arrival_plan": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arrival Plan"
+          },
+          "attend_again": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attend Again"
+          },
+          "attended": {
+            "default": true,
+            "title": "Attended",
+            "type": "boolean"
+          },
+          "best_selling_items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Selling Items"
+          },
+          "calendar_visibility": {
+            "default": true,
+            "title": "Calendar Visibility",
+            "type": "boolean"
+          },
+          "commitment_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Date"
+          },
+          "costs_eur": {
+            "default": "0",
+            "title": "Costs Eur",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "customer_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Notes"
+          },
+          "equipment_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equipment Notes"
+          },
+          "event_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Date"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "inventory_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inventory Notes"
+          },
+          "lessons_learned": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lessons Learned"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "operational_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operational Notes"
+          },
+          "opportunity_id": {
+            "maximum": 2147483647.0,
+            "minimum": 1.0,
+            "title": "Opportunity Id",
+            "type": "integer"
+          },
+          "opportunity_name": {
+            "title": "Opportunity Name",
+            "type": "string"
+          },
+          "pitch_number": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pitch Number"
+          },
+          "profit_eur": {
+            "title": "Profit Eur",
+            "type": "string"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "maximum": 5.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "revenue_eur": {
+            "default": "0",
+            "title": "Revenue Eur",
+            "type": "string"
+          },
+          "setup_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup End At"
+          },
+          "setup_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Start At"
+          },
+          "staffing_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staffing Notes"
+          },
+          "status": {
+            "default": "committed",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Status",
+            "type": "string"
+          },
+          "teardown_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Teardown End At"
+          },
+          "teardown_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Teardown Start At"
+          },
+          "travel_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Travel Notes"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          },
+          "weather_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weather Notes"
+          }
+        },
+        "required": [
+          "opportunity_id",
+          "id",
+          "profit_eur",
+          "created_at",
+          "updated_at",
+          "_links",
+          "opportunity_name"
+        ],
+        "title": "EngagementHAL",
+        "type": "object"
+      },
+      "EngagementUpdate": {
+        "properties": {
+          "arrival_plan": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arrival Plan"
+          },
+          "attend_again": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attend Again"
+          },
+          "attended": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attended"
+          },
+          "best_selling_items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Selling Items"
+          },
+          "calendar_visibility": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calendar Visibility"
+          },
+          "commitment_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Date"
+          },
+          "costs_eur": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Costs Eur"
+          },
+          "customer_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Notes"
+          },
+          "equipment_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equipment Notes"
+          },
+          "inventory_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inventory Notes"
+          },
+          "lessons_learned": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lessons Learned"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "operational_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operational Notes"
+          },
+          "pitch_number": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pitch Number"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "maximum": 5.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "revenue_eur": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Eur"
+          },
+          "setup_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup End At"
+          },
+          "setup_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Start At"
+          },
+          "staffing_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staffing Notes"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "maxLength": 50,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "teardown_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Teardown End At"
+          },
+          "teardown_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Teardown Start At"
+          },
+          "travel_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Travel Notes"
+          },
+          "weather_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weather Notes"
+          }
+        },
+        "title": "EngagementUpdate",
         "type": "object"
       },
       "HALLink": {
@@ -385,201 +1391,6 @@
           "reason"
         ],
         "title": "NotDuplicateRequest",
-        "type": "object"
-      },
-      "OperationCollection": {
-        "properties": {
-          "_embedded": {
-            "$ref": "#/components/schemas/OperationEmbedded"
-          },
-          "_links": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/HALLink"
-            },
-            "title": " Links",
-            "type": "object"
-          },
-          "page": {
-            "$ref": "#/components/schemas/PageMetadata"
-          }
-        },
-        "required": [
-          "_links",
-          "page",
-          "_embedded"
-        ],
-        "title": "OperationCollection",
-        "type": "object"
-      },
-      "OperationCreate": {
-        "properties": {
-          "commitment_date": {
-            "anyOf": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Commitment Date"
-          },
-          "notes": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Notes"
-          },
-          "opportunity_id": {
-            "maximum": 2147483647.0,
-            "minimum": 1.0,
-            "title": "Opportunity Id",
-            "type": "integer"
-          },
-          "status": {
-            "default": "committed",
-            "maxLength": 50,
-            "minLength": 1,
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "required": [
-          "opportunity_id"
-        ],
-        "title": "OperationCreate",
-        "type": "object"
-      },
-      "OperationEmbedded": {
-        "properties": {
-          "operations": {
-            "items": {
-              "$ref": "#/components/schemas/OperationHAL"
-            },
-            "title": "Operations",
-            "type": "array"
-          }
-        },
-        "required": [
-          "operations"
-        ],
-        "title": "OperationEmbedded",
-        "type": "object"
-      },
-      "OperationHAL": {
-        "properties": {
-          "_links": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/HALLink"
-            },
-            "title": " Links",
-            "type": "object"
-          },
-          "commitment_date": {
-            "anyOf": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Commitment Date"
-          },
-          "created_at": {
-            "title": "Created At",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "notes": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Notes"
-          },
-          "opportunity_id": {
-            "maximum": 2147483647.0,
-            "minimum": 1.0,
-            "title": "Opportunity Id",
-            "type": "integer"
-          },
-          "status": {
-            "default": "committed",
-            "maxLength": 50,
-            "minLength": 1,
-            "title": "Status",
-            "type": "string"
-          },
-          "updated_at": {
-            "title": "Updated At",
-            "type": "string"
-          }
-        },
-        "required": [
-          "opportunity_id",
-          "id",
-          "created_at",
-          "updated_at",
-          "_links"
-        ],
-        "title": "OperationHAL",
-        "type": "object"
-      },
-      "OperationUpdate": {
-        "properties": {
-          "commitment_date": {
-            "anyOf": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Commitment Date"
-          },
-          "notes": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Notes"
-          },
-          "status": {
-            "anyOf": [
-              {
-                "maxLength": 50,
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Status"
-          }
-        },
-        "title": "OperationUpdate",
         "type": "object"
       },
       "OpportunityCollection": {
@@ -738,6 +1549,18 @@
               }
             ],
             "title": "Profit Score"
+          },
+          "series_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Name"
           },
           "source_url": {
             "anyOf": [
@@ -945,6 +1768,18 @@
             ],
             "title": "Profit Score"
           },
+          "series_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Name"
+          },
           "source_url": {
             "anyOf": [
               {
@@ -1126,6 +1961,18 @@
             ],
             "title": "Profit Score"
           },
+          "series_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Name"
+          },
           "source_url": {
             "anyOf": [
               {
@@ -1163,6 +2010,176 @@
           "updated_at"
         ],
         "title": "OpportunityRead",
+        "type": "object"
+      },
+      "OpportunitySeriesAssignment": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "series_id": {
+            "anyOf": [
+              {
+                "maximum": 2147483647.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Id"
+          }
+        },
+        "title": "OpportunitySeriesAssignment",
+        "type": "object"
+      },
+      "OpportunitySeriesCollection": {
+        "properties": {
+          "_embedded": {
+            "$ref": "#/components/schemas/OpportunitySeriesEmbedded"
+          },
+          "_links": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HALLink"
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        },
+        "required": [
+          "_links",
+          "page",
+          "_embedded"
+        ],
+        "title": "OpportunitySeriesCollection",
+        "type": "object"
+      },
+      "OpportunitySeriesCreate": {
+        "properties": {
+          "active": {
+            "default": true,
+            "title": "Active",
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "OpportunitySeriesCreate",
+        "type": "object"
+      },
+      "OpportunitySeriesEmbedded": {
+        "properties": {
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/OpportunitySeriesHAL"
+            },
+            "title": "Series",
+            "type": "array"
+          }
+        },
+        "required": [
+          "series"
+        ],
+        "title": "OpportunitySeriesEmbedded",
+        "type": "object"
+      },
+      "OpportunitySeriesHAL": {
+        "properties": {
+          "_links": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/HALLink"
+            },
+            "title": " Links",
+            "type": "object"
+          },
+          "active": {
+            "default": true,
+            "title": "Active",
+            "type": "boolean"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "opportunity_count": {
+            "default": 0,
+            "title": "Opportunity Count",
+            "type": "integer"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "id",
+          "created_at",
+          "updated_at",
+          "_links"
+        ],
+        "title": "OpportunitySeriesHAL",
+        "type": "object"
+      },
+      "OpportunitySeriesUpdate": {
+        "properties": {
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "title": "OpportunitySeriesUpdate",
         "type": "object"
       },
       "OpportunityUpdate": {
@@ -1316,6 +2333,18 @@
               }
             ],
             "title": "Profit Score"
+          },
+          "series_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Name"
           },
           "source_url": {
             "anyOf": [
@@ -1534,7 +2563,7 @@
         "title": "PageMetadata",
         "type": "object"
       },
-      "PlanningOperation": {
+      "PlanningEngagement": {
         "properties": {
           "_links": {
             "additionalProperties": {
@@ -1569,7 +2598,7 @@
           "status",
           "_links"
         ],
-        "title": "PlanningOperation",
+        "title": "PlanningEngagement",
         "type": "object"
       },
       "PlanningOpportunity": {
@@ -1608,6 +2637,13 @@
             ],
             "title": "Distance Km"
           },
+          "engagements": {
+            "items": {
+              "$ref": "#/components/schemas/PlanningEngagement"
+            },
+            "title": "Engagements",
+            "type": "array"
+          },
           "event_date": {
             "anyOf": [
               {
@@ -1627,13 +2663,6 @@
           "name": {
             "title": "Name",
             "type": "string"
-          },
-          "operations": {
-            "items": {
-              "$ref": "#/components/schemas/PlanningOperation"
-            },
-            "title": "Operations",
-            "type": "array"
           },
           "profit_score": {
             "anyOf": [
@@ -1661,7 +2690,7 @@
           "id",
           "name",
           "application_status",
-          "operations",
+          "engagements",
           "_links"
         ],
         "title": "PlanningOpportunity",
@@ -7407,51 +8436,9 @@
         ]
       }
     },
-    "/v1/openapi.json": {
+    "/v1/engagements": {
       "get": {
-        "operationId": "api_v1_openapi_json_v1_openapi_json_get",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Download the canonical OpenAPI document as JSON",
-        "tags": [
-          "API contract"
-        ]
-      }
-    },
-    "/v1/openapi.yaml": {
-      "get": {
-        "operationId": "api_v1_openapi_yaml_v1_openapi_yaml_get",
-        "responses": {
-          "200": {
-            "content": {
-              "application/yaml": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Download the canonical OpenAPI document as YAML",
-        "tags": [
-          "API contract"
-        ]
-      }
-    },
-    "/v1/operations": {
-      "get": {
-        "operationId": "api_v1_list_operations_v1_operations_get",
+        "operationId": "api_v1_list_engagements_v1_engagements_get",
         "parameters": [
           {
             "in": "query",
@@ -7494,7 +8481,7 @@
             "content": {
               "application/hal+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OperationCollection"
+                  "$ref": "#/components/schemas/EngagementCollection"
                 }
               }
             },
@@ -7511,18 +8498,18 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Api-V1-List-Operations",
+        "summary": "Api-V1-List-Engagements",
         "tags": [
           "API v1"
         ]
       },
       "post": {
-        "operationId": "api_v1_create_operation_v1_operations_post",
+        "operationId": "api_v1_create_engagement_v1_engagements_post",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OperationCreate"
+                "$ref": "#/components/schemas/EngagementCreate"
               }
             }
           },
@@ -7533,7 +8520,7 @@
             "content": {
               "application/hal+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OperationHAL"
+                  "$ref": "#/components/schemas/EngagementHAL"
                 }
               }
             },
@@ -7550,24 +8537,108 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Api-V1-Create-Operation",
+        "summary": "Api-V1-Create-Engagement",
         "tags": [
           "API v1"
         ]
       }
     },
-    "/v1/operations/{operation_id}": {
+    "/v1/engagements/comparisons": {
       "get": {
-        "operationId": "api_v1_get_operation_v1_operations__operation_id__get",
+        "operationId": "api_v1_engagement_comparisons_v1_engagements_comparisons_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "group_by",
+            "required": false,
+            "schema": {
+              "default": "series",
+              "enum": [
+                "series",
+                "venue",
+                "organizer",
+                "municipality"
+              ],
+              "title": "Group By",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComparisonResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Engagement-Comparisons",
+        "tags": [
+          "API v1"
+        ]
+      }
+    },
+    "/v1/engagements/{engagement_id}": {
+      "delete": {
+        "operationId": "api_v1_delete_engagement_v1_engagements__engagement_id__delete",
         "parameters": [
           {
             "in": "path",
-            "name": "operation_id",
+            "name": "engagement_id",
             "required": true,
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
-              "title": "Operation Id",
+              "title": "Engagement Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Delete-Engagement",
+        "tags": [
+          "API v1"
+        ]
+      },
+      "get": {
+        "operationId": "api_v1_get_engagement_v1_engagements__engagement_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "engagement_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Engagement Id",
               "type": "integer"
             }
           }
@@ -7577,7 +8648,7 @@
             "content": {
               "application/hal+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OperationHAL"
+                  "$ref": "#/components/schemas/EngagementHAL"
                 }
               }
             },
@@ -7594,22 +8665,22 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Api-V1-Get-Operation",
+        "summary": "Api-V1-Get-Engagement",
         "tags": [
           "API v1"
         ]
       },
       "patch": {
-        "operationId": "api_v1_update_operation_v1_operations__operation_id__patch",
+        "operationId": "api_v1_update_engagement_v1_engagements__engagement_id__patch",
         "parameters": [
           {
             "in": "path",
-            "name": "operation_id",
+            "name": "engagement_id",
             "required": true,
             "schema": {
               "maximum": 2147483647,
               "minimum": 1,
-              "title": "Operation Id",
+              "title": "Engagement Id",
               "type": "integer"
             }
           }
@@ -7618,7 +8689,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OperationUpdate"
+                "$ref": "#/components/schemas/EngagementUpdate"
               }
             }
           },
@@ -7629,7 +8700,7 @@
             "content": {
               "application/hal+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OperationHAL"
+                  "$ref": "#/components/schemas/EngagementHAL"
                 }
               }
             },
@@ -7646,9 +8717,51 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Api-V1-Update-Operation",
+        "summary": "Api-V1-Update-Engagement",
         "tags": [
           "API v1"
+        ]
+      }
+    },
+    "/v1/openapi.json": {
+      "get": {
+        "operationId": "api_v1_openapi_json_v1_openapi_json_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Download the canonical OpenAPI document as JSON",
+        "tags": [
+          "API contract"
+        ]
+      }
+    },
+    "/v1/openapi.yaml": {
+      "get": {
+        "operationId": "api_v1_openapi_yaml_v1_openapi_yaml_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/yaml": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Download the canonical OpenAPI document as YAML",
+        "tags": [
+          "API contract"
         ]
       }
     },
@@ -7714,6 +8827,17 @@
               "maximum": 2147483647,
               "minimum": 1,
               "title": "Venue Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "series_id",
+            "required": false,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Series Id",
               "type": "integer"
             }
           },
@@ -7977,6 +9101,398 @@
           }
         },
         "summary": "Api-V1-Update-Opportunity",
+        "tags": [
+          "API v1"
+        ]
+      }
+    },
+    "/v1/opportunities/{opportunity_id}/series": {
+      "delete": {
+        "operationId": "api_v1_detach_opportunity_series_v1_opportunities__opportunity_id__series_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "opportunity_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Opportunity Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Detach-Opportunity-Series",
+        "tags": [
+          "API v1"
+        ]
+      },
+      "post": {
+        "operationId": "api_v1_create_series_from_opportunity_v1_opportunities__opportunity_id__series_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "opportunity_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Opportunity Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/OpportunitySeriesAssignment"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Create-Series-From-Opportunity",
+        "tags": [
+          "API v1"
+        ]
+      },
+      "put": {
+        "operationId": "api_v1_assign_opportunity_series_v1_opportunities__opportunity_id__series_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "opportunity_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Opportunity Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpportunitySeriesAssignment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Assign-Opportunity-Series",
+        "tags": [
+          "API v1"
+        ]
+      }
+    },
+    "/v1/opportunity-series": {
+      "get": {
+        "operationId": "api_v1_list_opportunity_series_v1_opportunity_series_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "active",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Active",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunitySeriesCollection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-List-Opportunity-Series",
+        "tags": [
+          "API v1"
+        ]
+      },
+      "post": {
+        "operationId": "api_v1_create_opportunity_series_v1_opportunity_series_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpportunitySeriesCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunitySeriesHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Create-Opportunity-Series",
+        "tags": [
+          "API v1"
+        ]
+      }
+    },
+    "/v1/opportunity-series/{series_id}": {
+      "delete": {
+        "operationId": "api_v1_delete_opportunity_series_v1_opportunity_series__series_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Series Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Delete-Opportunity-Series",
+        "tags": [
+          "API v1"
+        ]
+      },
+      "get": {
+        "operationId": "api_v1_get_opportunity_series_v1_opportunity_series__series_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Series Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunitySeriesHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Get-Opportunity-Series",
+        "tags": [
+          "API v1"
+        ]
+      },
+      "patch": {
+        "operationId": "api_v1_update_opportunity_series_v1_opportunity_series__series_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "title": "Series Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpportunitySeriesUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunitySeriesHAL"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Api-V1-Update-Opportunity-Series",
         "tags": [
           "API v1"
         ]

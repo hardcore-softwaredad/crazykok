@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response
@@ -20,15 +21,20 @@ from .hypermedia import (
     api_url,
     pagination_links,
 )
-from .opportunity_service import SORT_COLUMNS, filtered_opportunities, ordered_opportunities
+from .engagement_service import apply_engagement_values, comparison_rows
+from .opportunity_service import SORT_COLUMNS, apply_opportunity_values, filtered_opportunities, ordered_opportunities
 from .openapi_contract import api_docs_origin
 from .planning_service import planning_opportunities, straight_line_distance_km
 from .schemas import (
-    OperationCreate,
-    OperationRead,
-    OperationUpdate,
+    EngagementCreate,
+    EngagementRead,
+    EngagementUpdate,
     OpportunityCreate,
     OpportunityRead,
+    OpportunitySeriesAssignment,
+    OpportunitySeriesCreate,
+    OpportunitySeriesRead,
+    OpportunitySeriesUpdate,
     OpportunityUpdate,
 )
 from .venue_schemas import VenueRead
@@ -59,6 +65,21 @@ class OpportunityHAL(OpportunityRead):
     links: dict[str, HALLink | list[HALLink]] = Field(alias="_links")
 
 
+class OpportunitySeriesHAL(OpportunitySeriesRead):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+    links: dict[str, HALLink] = Field(alias="_links")
+    opportunity_count: int = 0
+
+
+class OpportunitySeriesEmbedded(HALModel):
+    series: list[OpportunitySeriesHAL]
+
+
+class OpportunitySeriesCollection(HALCollection):
+    embedded: OpportunitySeriesEmbedded = Field(alias="_embedded")
+
+
 class OpportunityEmbedded(HALModel):
     opportunities: list[OpportunityHAL]
 
@@ -67,18 +88,38 @@ class OpportunityCollection(HALCollection):
     embedded: OpportunityEmbedded = Field(alias="_embedded")
 
 
-class OperationHAL(OperationRead):
+class EngagementHAL(EngagementRead):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     links: dict[str, HALLink] = Field(alias="_links")
+    opportunity_name: str
+    event_date: date | None = None
 
 
-class OperationEmbedded(HALModel):
-    operations: list[OperationHAL]
+class EngagementEmbedded(HALModel):
+    engagements: list[EngagementHAL]
 
 
-class OperationCollection(HALCollection):
-    embedded: OperationEmbedded = Field(alias="_embedded")
+class EngagementCollection(HALCollection):
+    embedded: EngagementEmbedded = Field(alias="_embedded")
+
+
+class ComparisonYear(HALModel):
+    year: int
+    engagement_count: int
+    revenue_eur: Decimal
+    costs_eur: Decimal
+    profit_eur: Decimal
+
+
+class ComparisonGroup(HALModel):
+    group: str
+    years: list[ComparisonYear]
+
+
+class ComparisonResponse(HALResource):
+    group_by: Literal["series", "venue", "organizer", "municipality"]
+    groups: list[ComparisonGroup]
 
 
 class PlanningVenue(HALModel):
@@ -88,7 +129,7 @@ class PlanningVenue(HALModel):
     longitude: float | None = None
 
 
-class PlanningOperation(HALModel):
+class PlanningEngagement(HALModel):
     id: int
     status: str
     commitment_date: date | None = None
@@ -104,7 +145,7 @@ class PlanningOpportunity(HALModel):
     profit_score: float | None = None
     distance_km: float | None = None
     venue: PlanningVenue | None = None
-    operations: list[PlanningOperation]
+    engagements: list[PlanningEngagement]
     links: dict[str, HALLink] = Field(alias="_links")
 
 
@@ -160,15 +201,35 @@ def opportunity_links(request: Request, opportunity: models.Opportunity) -> dict
     }
     if opportunity.venue_id is not None:
         links["venue"] = HALLink(href=api_url(request, f"venues/{opportunity.venue_id}"))
-    links["operations"] = HALLink(
-        href=api_url(request, "operations", [("opportunity_id", opportunity.id)])
+    if opportunity.opportunity_series_id is not None:
+        links["series"] = HALLink(href=api_url(request, f"opportunity-series/{opportunity.opportunity_series_id}"))
+    links["engagements"] = HALLink(
+        href=api_url(request, "engagements", [("opportunity_id", opportunity.id)])
     )
+    links["series-assignment"] = HALLink(href=api_url(request, f"opportunities/{opportunity.id}/series"))
     return links
 
 
 def opportunity_resource(request: Request, opportunity: models.Opportunity) -> OpportunityHAL:
     data = OpportunityRead.model_validate(opportunity).model_dump()
     return OpportunityHAL(**data, links=opportunity_links(request, opportunity))
+
+
+def series_links(request: Request, series: models.OpportunitySeries) -> dict[str, HALLink]:
+    return {
+        "self": HALLink(href=api_url(request, f"opportunity-series/{series.id}")),
+        "collection": HALLink(href=api_url(request, "opportunity-series")),
+        "opportunities": HALLink(href=api_url(request, "opportunities", [("series_id", series.id)])),
+    }
+
+
+def series_resource(request: Request, series: models.OpportunitySeries) -> OpportunitySeriesHAL:
+    data = OpportunitySeriesRead.model_validate(series).model_dump()
+    return OpportunitySeriesHAL(
+        **data,
+        opportunity_count=len(series.opportunities),
+        links=series_links(request, series),
+    )
 
 
 def organizer_resource(request: Request, organizer: models.Organizer) -> OrganizerHAL:
@@ -208,7 +269,12 @@ def api_root(request: Request) -> APIRoot:
         links={
             "self": HALLink(href=api_url(request)),
             "opportunities": HALLink(href=api_url(request, "opportunities")),
-            "operations": HALLink(href=api_url(request, "operations")),
+            "opportunity-series": HALLink(href=api_url(request, "opportunity-series")),
+            "engagements": HALLink(href=api_url(request, "engagements")),
+            "engagement-comparisons": HALLink(
+                href=f"{api_url(request, 'engagements/comparisons')}{{?group_by}}",
+                templated=True,
+            ),
             "planning": HALLink(
                 href=(
                     f"{api_url(request, 'planning')}"
@@ -219,7 +285,7 @@ def api_root(request: Request) -> APIRoot:
             "opportunity-search": HALLink(
                 href=(
                     f"{api_url(request, 'opportunities')}"
-                    "{?q,status,category,location,organizer,venue_id,active,sort,direction,page,page_size}"
+                    "{?q,status,category,location,organizer,venue_id,series_id,active,sort,direction,page,page_size}"
                 ),
                 templated=True,
             ),
@@ -247,6 +313,7 @@ def list_opportunities(
     location: str | None = Query(default=None, max_length=255),
     organizer: str | None = Query(default=None, max_length=255),
     venue_id: int | None = Query(default=None, ge=1, le=2_147_483_647),
+    series_id: int | None = Query(default=None, ge=1, le=2_147_483_647),
     active: bool | None = Query(default=True),
     sort: OpportunitySort = Query(default="event_date"),
     direction: str = Query(default="asc", pattern="^(asc|desc)$"),
@@ -265,6 +332,7 @@ def list_opportunities(
         location=location,
         organizer=organizer,
         venue_id=venue_id,
+        series_id=series_id,
         active=active,
     )
     total = filtered.count()
@@ -283,6 +351,7 @@ def list_opportunities(
         ("location", location),
         ("organizer", organizer),
         ("venue_id", venue_id),
+        ("series_id", series_id),
         ("active", active),
     ):
         if value is not None:
@@ -304,7 +373,8 @@ def create_opportunity(
     opportunity: OpportunityCreate,
     db: Session = Depends(get_db),
 ) -> OpportunityHAL:
-    record = models.Opportunity(**opportunity.model_dump())
+    record = models.Opportunity()
+    apply_opportunity_values(db, record, opportunity.model_dump())
     db.add(record)
     db.commit()
     db.refresh(record)
@@ -320,6 +390,131 @@ def get_opportunity_or_404(db: Session, opportunity_id: int) -> models.Opportuni
     return record
 
 
+def get_series_or_404(db: Session, series_id: int) -> models.OpportunitySeries:
+    record = db.query(models.OpportunitySeries).filter(models.OpportunitySeries.id == series_id).first()
+    if record is None:
+        raise HTTPException(status_code=404, detail="Opportunity series not found")
+    return record
+
+
+def find_or_create_series(db: Session, name: str) -> models.OpportunitySeries:
+    cleaned = name.strip()
+    if not cleaned:
+        raise HTTPException(status_code=422, detail="Series name cannot be blank")
+    record = db.query(models.OpportunitySeries).filter(models.OpportunitySeries.name == cleaned).first()
+    if record is None:
+        record = models.OpportunitySeries(name=cleaned)
+        db.add(record)
+        db.flush()
+    return record
+
+
+@router.get(
+    "/opportunity-series",
+    response_model=OpportunitySeriesCollection,
+    response_model_exclude_none=True,
+    name="api-v1-list-opportunity-series",
+)
+def list_opportunity_series(
+    request: Request,
+    active: bool | None = Query(default=True),
+    page: PageNumber = 1,
+    page_size: PageSize = 25,
+    db: Session = Depends(get_db),
+) -> OpportunitySeriesCollection:
+    query = db.query(models.OpportunitySeries)
+    if active is not None:
+        query = query.filter(models.OpportunitySeries.active == active)
+    total = query.count()
+    records = (
+        query.order_by(models.OpportunitySeries.name.asc(), models.OpportunitySeries.id.asc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+    page_data = Page(number=page, size=page_size, total_elements=total)
+    query_params: list[tuple[str, str | int | bool]] = [("page_size", page_size)]
+    if active is not None:
+        query_params.append(("active", active))
+    return OpportunitySeriesCollection(
+        links=pagination_links(request, "opportunity-series", query_params, page_data),
+        page=page_data.metadata(),
+        embedded=OpportunitySeriesEmbedded(series=[series_resource(request, item) for item in records]),
+    )
+
+
+@router.post(
+    "/opportunity-series",
+    response_model=OpportunitySeriesHAL,
+    response_model_exclude_none=True,
+    status_code=201,
+    name="api-v1-create-opportunity-series",
+)
+def create_opportunity_series(
+    request: Request,
+    response: Response,
+    payload: OpportunitySeriesCreate,
+    db: Session = Depends(get_db),
+) -> OpportunitySeriesHAL:
+    if db.query(models.OpportunitySeries).filter(models.OpportunitySeries.name == payload.name.strip()).first():
+        raise HTTPException(status_code=409, detail="Opportunity series already exists")
+    record = models.OpportunitySeries(name=payload.name.strip(), active=payload.active)
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    resource = series_resource(request, record)
+    response.headers["Location"] = resource.links["self"].href
+    return resource
+
+
+@router.get(
+    "/opportunity-series/{series_id}",
+    response_model=OpportunitySeriesHAL,
+    response_model_exclude_none=True,
+    name="api-v1-get-opportunity-series",
+)
+def get_opportunity_series(request: Request, series_id: DatabaseID, db: Session = Depends(get_db)) -> OpportunitySeriesHAL:
+    return series_resource(request, get_series_or_404(db, series_id))
+
+
+@router.patch(
+    "/opportunity-series/{series_id}",
+    response_model=OpportunitySeriesHAL,
+    response_model_exclude_none=True,
+    name="api-v1-update-opportunity-series",
+)
+def update_opportunity_series(
+    request: Request,
+    series_id: DatabaseID,
+    payload: OpportunitySeriesUpdate,
+    db: Session = Depends(get_db),
+) -> OpportunitySeriesHAL:
+    record = get_series_or_404(db, series_id)
+    values = payload.model_dump(exclude_unset=True)
+    if "name" in values:
+        name = values["name"].strip()
+        duplicate = db.query(models.OpportunitySeries).filter(
+            models.OpportunitySeries.name == name,
+            models.OpportunitySeries.id != series_id,
+        ).first()
+        if duplicate:
+            raise HTTPException(status_code=409, detail="Opportunity series already exists")
+        record.name = name
+        values.pop("name")
+    for field, value in values.items():
+        setattr(record, field, value)
+    db.commit()
+    db.refresh(record)
+    return series_resource(request, record)
+
+
+@router.delete("/opportunity-series/{series_id}", status_code=204, name="api-v1-delete-opportunity-series")
+def delete_opportunity_series(series_id: DatabaseID, db: Session = Depends(get_db)) -> Response:
+    db.delete(get_series_or_404(db, series_id))
+    db.commit()
+    return Response(status_code=204)
+
+
 @router.get("/opportunities/{opportunity_id}", response_model=OpportunityHAL, response_model_exclude_none=True, name="api-v1-get-opportunity")
 def get_opportunity(request: Request, opportunity_id: DatabaseID, db: Session = Depends(get_db)) -> OpportunityHAL:
     return opportunity_resource(request, get_opportunity_or_404(db, opportunity_id))
@@ -333,8 +528,7 @@ def update_opportunity(
     db: Session = Depends(get_db),
 ) -> OpportunityHAL:
     record = get_opportunity_or_404(db, opportunity_id)
-    for field, value in changes.model_dump(exclude_unset=True).items():
-        setattr(record, field, value)
+    apply_opportunity_values(db, record, changes.model_dump(exclude_unset=True))
     db.commit()
     db.refresh(record)
     return opportunity_resource(request, record)
@@ -348,88 +542,184 @@ def delete_opportunity(opportunity_id: DatabaseID, db: Session = Depends(get_db)
     return Response(status_code=204)
 
 
-def operation_links(request: Request, operation: models.Operation) -> dict[str, HALLink]:
-    return {
-        "self": HALLink(href=api_url(request, f"operations/{operation.id}")),
-        "collection": HALLink(href=api_url(request, "operations")),
-        "opportunity": HALLink(href=api_url(request, f"opportunities/{operation.opportunity_id}")),
+@router.put(
+    "/opportunities/{opportunity_id}/series",
+    response_model=OpportunityHAL,
+    response_model_exclude_none=True,
+    name="api-v1-assign-opportunity-series",
+)
+def assign_opportunity_series(
+    request: Request,
+    opportunity_id: DatabaseID,
+    payload: OpportunitySeriesAssignment,
+    db: Session = Depends(get_db),
+) -> OpportunityHAL:
+    opportunity = get_opportunity_or_404(db, opportunity_id)
+    if payload.series_id is None and payload.name is None:
+        raise HTTPException(status_code=422, detail="Provide either series_id or name")
+    if payload.series_id is not None and payload.name is not None:
+        raise HTTPException(status_code=422, detail="Provide only one of series_id or name")
+    opportunity.series = get_series_or_404(db, payload.series_id) if payload.series_id else find_or_create_series(db, payload.name or "")
+    db.commit()
+    db.refresh(opportunity)
+    return opportunity_resource(request, opportunity)
+
+
+@router.post(
+    "/opportunities/{opportunity_id}/series",
+    response_model=OpportunityHAL,
+    response_model_exclude_none=True,
+    status_code=201,
+    name="api-v1-create-series-from-opportunity",
+)
+def create_series_from_opportunity(
+    request: Request,
+    opportunity_id: DatabaseID,
+    payload: OpportunitySeriesAssignment | None = None,
+    db: Session = Depends(get_db),
+) -> OpportunityHAL:
+    opportunity = get_opportunity_or_404(db, opportunity_id)
+    name = payload.name if payload and payload.name else opportunity.name
+    opportunity.series = find_or_create_series(db, name)
+    db.commit()
+    db.refresh(opportunity)
+    return opportunity_resource(request, opportunity)
+
+
+@router.delete(
+    "/opportunities/{opportunity_id}/series",
+    response_model=OpportunityHAL,
+    response_model_exclude_none=True,
+    name="api-v1-detach-opportunity-series",
+)
+def detach_opportunity_series(
+    request: Request,
+    opportunity_id: DatabaseID,
+    db: Session = Depends(get_db),
+) -> OpportunityHAL:
+    opportunity = get_opportunity_or_404(db, opportunity_id)
+    opportunity.series = None
+    db.commit()
+    db.refresh(opportunity)
+    return opportunity_resource(request, opportunity)
+
+
+def engagement_links(request: Request, engagement: models.Engagement) -> dict[str, HALLink]:
+    links = {
+        "self": HALLink(href=api_url(request, f"engagements/{engagement.id}")),
+        "collection": HALLink(href=api_url(request, "engagements")),
+        "opportunity": HALLink(href=api_url(request, f"opportunities/{engagement.opportunity_id}")),
     }
+    return links
 
 
-def operation_resource(request: Request, operation: models.Operation) -> OperationHAL:
-    data = OperationRead.model_validate(operation).model_dump()
-    return OperationHAL(**data, links=operation_links(request, operation))
+def engagement_resource(request: Request, engagement: models.Engagement) -> EngagementHAL:
+    data = EngagementRead.model_validate(engagement).model_dump()
+    return EngagementHAL(
+        **data,
+        opportunity_name=engagement.opportunity.name,
+        event_date=engagement.opportunity.event_date,
+        links=engagement_links(request, engagement),
+    )
 
 
-def get_operation_or_404(db: Session, operation_id: int) -> models.Operation:
-    record = db.query(models.Operation).filter(models.Operation.id == operation_id).first()
+def get_engagement_or_404(db: Session, engagement_id: int) -> models.Engagement:
+    record = db.query(models.Engagement).filter(models.Engagement.id == engagement_id).first()
     if record is None:
-        raise HTTPException(status_code=404, detail="Operation not found")
+        raise HTTPException(status_code=404, detail="Engagement not found")
     return record
 
 
-@router.get("/operations", response_model=OperationCollection, response_model_exclude_none=True, name="api-v1-list-operations")
-def list_operations(
+@router.get("/engagements", response_model=EngagementCollection, response_model_exclude_none=True, name="api-v1-list-engagements")
+def list_engagements(
     request: Request,
     opportunity_id: int | None = Query(default=None, ge=1, le=2_147_483_647),
     page: PageNumber = 1,
     page_size: PageSize = 25,
     db: Session = Depends(get_db),
-) -> OperationCollection:
-    query = db.query(models.Operation)
+) -> EngagementCollection:
+    query = db.query(models.Engagement)
     if opportunity_id is not None:
-        query = query.filter(models.Operation.opportunity_id == opportunity_id)
+        query = query.filter(models.Engagement.opportunity_id == opportunity_id)
     total = query.count()
-    records = query.order_by(models.Operation.id).offset((page - 1) * page_size).limit(page_size).all()
+    records = query.order_by(models.Engagement.id).offset((page - 1) * page_size).limit(page_size).all()
     page_data = Page(page, page_size, total)
     query_params: list[tuple[str, str | int | bool]] = []
     if opportunity_id is not None:
         query_params.append(("opportunity_id", opportunity_id))
     query_params.append(("page_size", page_size))
-    return OperationCollection(
-        links=pagination_links(request, "operations", query_params, page_data),
+    return EngagementCollection(
+        links=pagination_links(request, "engagements", query_params, page_data),
         page=page_data.metadata(),
-        embedded=OperationEmbedded(
-            operations=[operation_resource(request, record) for record in records]
+        embedded=EngagementEmbedded(
+            engagements=[engagement_resource(request, record) for record in records]
         ),
     )
 
 
-@router.post("/operations", response_model=OperationHAL, response_model_exclude_none=True, status_code=201, name="api-v1-create-operation")
-def create_operation(
+@router.post("/engagements", response_model=EngagementHAL, response_model_exclude_none=True, status_code=201, name="api-v1-create-engagement")
+def create_engagement(
     request: Request,
     response: Response,
-    operation: OperationCreate,
+    engagement: EngagementCreate,
     db: Session = Depends(get_db),
-) -> OperationHAL:
-    get_opportunity_or_404(db, operation.opportunity_id)
-    record = models.Operation(**operation.model_dump())
+) -> EngagementHAL:
+    get_opportunity_or_404(db, engagement.opportunity_id)
+    record = models.Engagement()
+    apply_engagement_values(record, engagement.model_dump())
     db.add(record)
     db.commit()
     db.refresh(record)
-    resource = operation_resource(request, record)
+    resource = engagement_resource(request, record)
     response.headers["Location"] = resource.links["self"].href
     return resource
 
 
-@router.get("/operations/{operation_id}", response_model=OperationHAL, response_model_exclude_none=True, name="api-v1-get-operation")
-def get_operation(request: Request, operation_id: DatabaseID, db: Session = Depends(get_db)) -> OperationHAL:
-    return operation_resource(request, get_operation_or_404(db, operation_id))
-
-
-@router.patch("/operations/{operation_id}", response_model=OperationHAL, response_model_exclude_none=True, name="api-v1-update-operation")
-def update_operation(
+@router.get(
+    "/engagements/comparisons",
+    response_model=ComparisonResponse,
+    response_model_exclude_none=True,
+    name="api-v1-engagement-comparisons",
+)
+def engagement_comparisons(
     request: Request,
-    operation_id: DatabaseID,
-    changes: OperationUpdate,
+    group_by: Literal["series", "venue", "organizer", "municipality"] = "series",
     db: Session = Depends(get_db),
-) -> OperationHAL:
-    record = get_operation_or_404(db, operation_id)
-    for field, value in changes.model_dump(exclude_unset=True).items():
-        setattr(record, field, value)
+) -> ComparisonResponse:
+    return ComparisonResponse(
+        group_by=group_by,
+        groups=[ComparisonGroup(**row) for row in comparison_rows(db, group_by)],
+        links={
+            "self": HALLink(href=api_url(request, "engagements/comparisons", [("group_by", group_by)])),
+            "collection": HALLink(href=api_url(request, "engagements")),
+        },
+    )
+
+
+@router.get("/engagements/{engagement_id}", response_model=EngagementHAL, response_model_exclude_none=True, name="api-v1-get-engagement")
+def get_engagement(request: Request, engagement_id: DatabaseID, db: Session = Depends(get_db)) -> EngagementHAL:
+    return engagement_resource(request, get_engagement_or_404(db, engagement_id))
+
+
+@router.patch("/engagements/{engagement_id}", response_model=EngagementHAL, response_model_exclude_none=True, name="api-v1-update-engagement")
+def update_engagement(
+    request: Request,
+    engagement_id: DatabaseID,
+    changes: EngagementUpdate,
+    db: Session = Depends(get_db),
+) -> EngagementHAL:
+    record = get_engagement_or_404(db, engagement_id)
+    apply_engagement_values(record, changes.model_dump(exclude_unset=True))
     db.commit()
     db.refresh(record)
-    return operation_resource(request, record)
+    return engagement_resource(request, record)
+
+
+@router.delete("/engagements/{engagement_id}", status_code=204, name="api-v1-delete-engagement")
+def delete_engagement(engagement_id: DatabaseID, db: Session = Depends(get_db)) -> Response:
+    db.delete(get_engagement_or_404(db, engagement_id))
+    db.commit()
+    return Response(status_code=204)
 
 
 @router.get("/planning", response_model=PlanningResponse, response_model_exclude_none=True, name="api-v1-planning")
@@ -475,15 +765,15 @@ def get_planning(
                     if venue
                     else None
                 ),
-                operations=[
-                    PlanningOperation(
-                        id=operation.id,
-                        status=operation.status,
-                        commitment_date=operation.commitment_date,
-                        links=operation_links(request, operation),
+                engagements=[
+                    PlanningEngagement(
+                        id=engagement.id,
+                        status=engagement.status,
+                        commitment_date=engagement.commitment_date,
+                        links=engagement_links(request, engagement),
                     )
-                    for operation in record.operations
-                    if status is None or operation.status == status
+                    for engagement in record.engagements
+                    if status is None or engagement.status == status
                 ],
                 links=opportunity_links(request, record),
             )

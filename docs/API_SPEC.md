@@ -2,7 +2,7 @@
 
 ## Updated API Language
 
-Use opportunity/operation terminology in public API routes.
+Use opportunity/engagement terminology in public API routes.
 
 ## Version And Hypermedia Contract
 
@@ -24,7 +24,7 @@ excluded. Individual components are also available as standalone JSON Schema
 documents whose references resolve through local `$defs`.
 
 The API root advertises opportunity search as an RFC 6570 URI template with
-`q`, `status`, `category`, `location`, `organizer`, `venue_id`, `active`,
+`q`, `status`, `category`, `location`, `organizer`, `venue_id`, `series_id`, `active`,
 `sort`, `direction`, `page`, and `page_size` parameters.
 
 Venue search is also advertised as a URI template with `q`, `town`,
@@ -65,7 +65,10 @@ pass, and the user confirms that no local scripts still consume the old shape.
 - `PATCH /api/v1/opportunity-series/{id}`
 - `DELETE /api/v1/opportunity-series/{id}`
 
-Advertise these links only after the resource is implemented.
+Opportunity series resources are implemented. They group recurring or named
+business sources such as a weekly market, annual festival, or repeat private
+client. Opportunities can be attached to a series from either side of the
+relationship.
 
 ### Opportunities
 
@@ -74,6 +77,13 @@ Advertise these links only after the resource is implemented.
 - `GET /api/v1/opportunities/{id}`
 - `PATCH /api/v1/opportunities/{id}`
 - `DELETE /api/v1/opportunities/{id}`
+- `PUT /api/v1/opportunities/{id}/series`
+- `POST /api/v1/opportunities/{id}/series`
+- `DELETE /api/v1/opportunities/{id}/series`
+
+The series-assignment endpoints attach an opportunity to an existing series,
+create/find a series by name from the opportunity, or detach it. This supports
+discovering recurrence after an opportunity already exists.
 
 ### Search
 
@@ -105,36 +115,31 @@ Suggested filters:
 
 Advertise these links only after the resource is implemented.
 
-### Operations
+### Engagements
 
-- `GET /api/v1/operations`
-- `POST /api/v1/operations`
-- `GET /api/v1/operations/{id}`
-- `PATCH /api/v1/operations/{id}`
+- `GET /api/v1/engagements`
+- `POST /api/v1/engagements`
+- `GET /api/v1/engagements/{id}`
+- `PATCH /api/v1/engagements/{id}`
+- `DELETE /api/v1/engagements/{id}`
+- `GET /api/v1/engagements/comparisons{?group_by}`
 
-Advertise these links only after the resource is implemented.
-
-The implemented Milestone 05 subset exposes commitment status, commitment date,
-notes, and the related opportunity. Detailed operation planning fields remain in
-Milestone 07.
+Engagement resources expose commitment and pitch details, setup and teardown
+times, arrival, staffing, equipment, inventory, travel and general notes,
+calendar visibility, and actual result fields such as attendance, revenue,
+costs, profit, weather, best sellers, customer notes, rating, attend-again
+judgment, and lessons learned. Profit is always calculated by the server as
+revenue minus costs. Comparisons accept `series`, `venue`, `organizer`, or
+`municipality` and derive annual totals from completed dated engagements.
 
 ### Planning
 
 - `GET /api/v1/planning`
 
 The HAL planning projection joins active opportunities to venues and committed
-operations. It accepts `date_from`, `date_to`, `max_distance_km`, `status`, and
+engagements. It accepts `date_from`, `date_to`, `max_distance_km`, `status`, and
 `min_score`, and returns visible warnings for opportunities missing coordinates
 or dates.
-
-### Operation Outcomes
-
-- `GET /api/v1/operation-outcomes`
-- `POST /api/v1/operation-outcomes`
-- `GET /api/v1/operation-outcomes/{id}`
-- `PATCH /api/v1/operation-outcomes/{id}`
-
-Advertise these links only after the resource is implemented.
 
 ### Organizers
 
@@ -170,5 +175,5 @@ Suggested feed types:
 - all_opportunities
 - filtered_opportunities
 - application_deadlines
-- committed_operations
-- operation_tasks
+- committed_engagements
+- engagement_tasks

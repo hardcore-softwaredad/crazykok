@@ -3,13 +3,19 @@ import logoUrl from './assets/crazykok-logo.png'
 import ImportWorkspace from './ImportWorkspace'
 import VenueWorkspace from './VenueWorkspace'
 import PlanningWorkspace from './PlanningWorkspace'
+import EngagementsWorkspace from './EngagementsWorkspace'
 import {
+  assignOpportunitySeries,
   createOpportunity,
+  createSeriesFromOpportunity,
   deleteOpportunity,
+  detachOpportunitySeries,
   findOpportunities,
+  findOpportunitySeries,
   followOpportunityPage,
   type HalLinks,
   type Opportunity,
+  type OpportunitySeries,
   type PageMetadata,
   updateOpportunity,
 } from './api'
@@ -21,6 +27,7 @@ type EventForm = {
   event_date: string
   application_deadline: string
   organizer: string
+  series_name: string
   category: string
   application_status: string
   source_url: string
@@ -51,6 +58,7 @@ const emptyForm: EventForm = {
   event_date: '',
   application_deadline: '',
   organizer: '',
+  series_name: '',
   category: '',
   application_status: 'researching',
   source_url: '',
@@ -69,6 +77,7 @@ function toForm(event: Opportunity): EventForm {
     event_date: event.event_date ?? '',
     application_deadline: event.application_deadline ?? '',
     organizer: event.organizer ?? '',
+    series_name: event.series_name ?? '',
     category: event.category ?? '',
     application_status: event.application_status,
     source_url: event.source_url ?? '',
@@ -88,6 +97,7 @@ function formToPayload(form: EventForm) {
     event_date: form.event_date || null,
     application_deadline: form.application_deadline || null,
     organizer: form.organizer.trim() || null,
+    series_name: form.series_name.trim() || null,
     category: form.category.trim() || null,
     application_status: form.application_status,
     source_url: form.source_url.trim() || null,
@@ -101,6 +111,7 @@ function formToPayload(form: EventForm) {
 
 function OpportunityWorkspace() {
   const [events, setEvents] = useState<Opportunity[]>([])
+  const [series, setSeries] = useState<OpportunitySeries[]>([])
   const [page, setPage] = useState<PageMetadata>({ number: 1, size: 25, total_elements: 0, total_pages: 0 })
   const [pageLinks, setPageLinks] = useState<HalLinks>({})
   const [query, setQuery] = useState('')
@@ -113,6 +124,7 @@ function OpportunityWorkspace() {
   const [isCreating, setIsCreating] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [seriesSelection, setSeriesSelection] = useState('')
   const [error, setError] = useState<string | null>(null)
 
   const selectedEvent = events.find((event) => event.id === selectedEventId) ?? null
@@ -152,15 +164,29 @@ function OpportunityWorkspace() {
     }
   }
 
+  const loadSeries = async () => {
+    try {
+      const collection = await findOpportunitySeries()
+      setSeries(collection._embedded.series)
+    } catch {
+      setSeries([])
+    }
+  }
+
   useEffect(() => {
     loadEvents()
   }, [query, statusFilter, activeFilter, sortKey, sortDirection])
 
   useEffect(() => {
+    loadSeries()
+  }, [])
+
+  useEffect(() => {
     if (selectedEvent && !isCreating) {
       setForm(toForm(selectedEvent))
+      setSeriesSelection(series.find((item) => item.name === selectedEvent.series_name)?.id.toString() ?? '')
     }
-  }, [selectedEvent?.id, isCreating])
+  }, [selectedEvent?.id, selectedEvent?.series_name, isCreating, series])
 
   const summary = useMemo(
     () => ({
@@ -223,6 +249,44 @@ function OpportunityWorkspace() {
     await deleteOpportunity(selectedEvent)
     setSelectedEventId(null)
     await loadEvents()
+  }
+
+  const attachSelectedSeries = async () => {
+    if (!selectedEvent || !seriesSelection) return
+    setError(null)
+    try {
+      const savedEvent = await assignOpportunitySeries(selectedEvent, { series_id: Number(seriesSelection) })
+      setSelectedEventId(savedEvent.id)
+      await loadEvents()
+    } catch {
+      setError('Could not attach this opportunity to the selected series.')
+    }
+  }
+
+  const createSeriesForSelected = async () => {
+    if (!selectedEvent) return
+    setError(null)
+    try {
+      const savedEvent = await createSeriesFromOpportunity(selectedEvent, { name: form.series_name || selectedEvent.name })
+      setSelectedEventId(savedEvent.id)
+      await loadSeries()
+      await loadEvents()
+    } catch {
+      setError('Could not create a series from this opportunity.')
+    }
+  }
+
+  const detachSeriesFromSelected = async () => {
+    if (!selectedEvent) return
+    setError(null)
+    try {
+      const savedEvent = await detachOpportunitySeries(selectedEvent)
+      setSelectedEventId(savedEvent.id)
+      setSeriesSelection('')
+      await loadEvents()
+    } catch {
+      setError('Could not detach this opportunity from its series.')
+    }
   }
 
   const toggleSort = (key: SortKey) => {
@@ -409,6 +473,31 @@ function OpportunityWorkspace() {
                 Organizer
                 <input value={form.organizer} onChange={(event) => updateForm('organizer', event.target.value)} />
               </label>
+              <label>
+                Opportunity series
+                <input value={form.series_name} onChange={(event) => updateForm('series_name', event.target.value)} placeholder="Recurring event name" />
+              </label>
+              {!isCreating && selectedEvent ? (
+                <section className="series-tools" aria-label="Opportunity series tools">
+                  <p>
+                    Current series: <strong>{selectedEvent.series_name ?? 'None'}</strong>
+                  </p>
+                  <div className="form-grid">
+                    <label>
+                      Attach existing series
+                      <select value={seriesSelection} onChange={(event) => setSeriesSelection(event.target.value)}>
+                        <option value="">Choose a series</option>
+                        {series.map((item) => <option key={item.id} value={item.id}>{item.name} ({item.opportunity_count})</option>)}
+                      </select>
+                    </label>
+                    <button type="button" className="quiet-action" onClick={attachSelectedSeries} disabled={!seriesSelection}>Attach</button>
+                  </div>
+                  <div className="inline-actions">
+                    <button type="button" className="quiet-action" onClick={createSeriesForSelected}>Create series from this opportunity</button>
+                    <button type="button" className="quiet-action" onClick={detachSeriesFromSelected} disabled={!selectedEvent.series_name}>Detach from series</button>
+                  </div>
+                </section>
+              ) : null}
               <div className="form-grid">
                 <label>
                   Status
@@ -475,7 +564,7 @@ function OpportunityWorkspace() {
 }
 
 function App() {
-  const [view, setView] = useState<'opportunities' | 'planning' | 'venues' | 'import'>('venues')
+  const [view, setView] = useState<'opportunities' | 'planning' | 'engagements' | 'venues' | 'import'>('venues')
 
   return (
     <div>
@@ -484,11 +573,12 @@ function App() {
         <div className="nav-links">
           <button className={view === 'opportunities' ? 'active' : ''} onClick={() => setView('opportunities')}>Opportunities</button>
           <button className={view === 'planning' ? 'active' : ''} onClick={() => setView('planning')}>Map &amp; calendar</button>
+          <button className={view === 'engagements' ? 'active' : ''} onClick={() => setView('engagements')}>Engagements</button>
           <button className={view === 'venues' ? 'active' : ''} onClick={() => setView('venues')}>Venues</button>
           <button className={view === 'import' ? 'active' : ''} onClick={() => setView('import')}>Import venues</button>
         </div>
       </nav>
-      {view === 'opportunities' ? <OpportunityWorkspace /> : view === 'planning' ? <PlanningWorkspace /> : view === 'venues' ? <VenueWorkspace /> : <ImportWorkspace />}
+      {view === 'opportunities' ? <OpportunityWorkspace /> : view === 'planning' ? <PlanningWorkspace /> : view === 'engagements' ? <EngagementsWorkspace /> : view === 'venues' ? <VenueWorkspace /> : <ImportWorkspace />}
     </div>
   )
 }

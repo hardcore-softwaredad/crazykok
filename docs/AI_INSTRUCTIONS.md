@@ -7,20 +7,18 @@ Use the updated domain language:
 - Opportunity
 - Opportunity Series
 - Application
-- Operation
-- Operation Outcome
+- Engagement
 - Calendar Feed
 
 Avoid reintroducing old event/trading terminology except where referring to external public event names.
 
 ## If Existing Code Uses Old Names
 
-If code already contains `events`, `event_occurrences`, `trading_history`, or `trading_commitments`, refactor toward:
+If code already contains `events`, `event_occurrences`, `trading_history`, `trading_commitments`, `operations`, or `operation_outcomes`, refactor toward:
 
 - `opportunity_series`
 - `opportunities`
-- `operation_outcomes`
-- `operations`
+- `engagements`
 
 Do this before adding major features.
 
@@ -30,8 +28,8 @@ Do this before adding major features.
 2. Opportunity CRUD
 3. Search/filter
 4. Application tracking
-5. Operation tracking
-6. Operation outcomes
+5. Engagement tracking
+6. Engagement actuals and comparisons
 7. CSV import/export
 8. Map/calendar views
 9. ICS calendar feeds

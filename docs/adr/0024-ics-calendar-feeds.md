@@ -25,7 +25,7 @@ This project is a private, local-first operating system for discovering opportun
 
 ## Decision
 
-Provide subscribable read-only iCalendar feeds for opportunities, filtered opportunities, deadlines, operations, and tasks.
+Provide subscribable read-only iCalendar feeds for opportunities, filtered opportunities, deadlines, engagements, and tasks.
 
 ## Consequences
 

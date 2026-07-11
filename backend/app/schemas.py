@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -22,6 +23,34 @@ class OpportunityBase(UTCModel):
     profit_score: Optional[float] = Field(default=None, ge=0, le=100)
     is_active: bool = True
     venue_id: Optional[int] = Field(default=None, ge=1, le=2_147_483_647)
+    series_name: Optional[str] = Field(default=None, max_length=255)
+
+
+class OpportunitySeriesBase(UTCModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    active: bool = True
+
+
+class OpportunitySeriesCreate(OpportunitySeriesBase):
+    pass
+
+
+class OpportunitySeriesUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    active: Optional[bool] = None
+
+
+class OpportunitySeriesRead(OpportunitySeriesBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class OpportunitySeriesAssignment(BaseModel):
+    series_id: Optional[int] = Field(default=None, ge=1, le=2_147_483_647)
+    name: Optional[str] = Field(default=None, min_length=1, max_length=255)
 
 
 class OpportunityCreate(OpportunityBase):
@@ -44,6 +73,7 @@ class OpportunityUpdate(BaseModel):
     profit_score: Optional[float] = Field(default=None, ge=0, le=100)
     is_active: Optional[bool] = None
     venue_id: Optional[int] = Field(default=None, ge=1, le=2_147_483_647)
+    series_name: Optional[str] = Field(default=None, max_length=255)
 
 
 class OpportunityRead(OpportunityBase):
@@ -71,26 +101,69 @@ class OrganizerRead(BaseModel):
     notes: Optional[str] = None
 
 
-class OperationBase(UTCModel):
+class EngagementBase(UTCModel):
     opportunity_id: int = Field(ge=1, le=2_147_483_647)
     status: str = Field(default="committed", min_length=1, max_length=50)
     commitment_date: Optional[date] = None
+    pitch_number: Optional[str] = Field(default=None, max_length=100)
+    setup_start_at: Optional[datetime] = None
+    setup_end_at: Optional[datetime] = None
+    teardown_start_at: Optional[datetime] = None
+    teardown_end_at: Optional[datetime] = None
+    arrival_plan: Optional[str] = None
+    staffing_notes: Optional[str] = None
+    equipment_notes: Optional[str] = None
+    inventory_notes: Optional[str] = None
+    travel_notes: Optional[str] = None
+    calendar_visibility: bool = True
     notes: Optional[str] = None
+    attended: bool = True
+    revenue_eur: Decimal = Field(default=Decimal("0"), ge=0, max_digits=12, decimal_places=2)
+    costs_eur: Decimal = Field(default=Decimal("0"), ge=0, max_digits=12, decimal_places=2)
+    weather_notes: Optional[str] = None
+    best_selling_items: Optional[str] = None
+    operational_notes: Optional[str] = None
+    customer_notes: Optional[str] = None
+    rating: Optional[int] = Field(default=None, ge=1, le=5)
+    attend_again: Optional[bool] = None
+    lessons_learned: Optional[str] = None
 
 
-class OperationCreate(OperationBase):
+class EngagementCreate(EngagementBase):
     pass
 
 
-class OperationUpdate(BaseModel):
+class EngagementUpdate(BaseModel):
     status: Optional[str] = Field(default=None, min_length=1, max_length=50)
     commitment_date: Optional[date] = None
+    pitch_number: Optional[str] = Field(default=None, max_length=100)
+    setup_start_at: Optional[datetime] = None
+    setup_end_at: Optional[datetime] = None
+    teardown_start_at: Optional[datetime] = None
+    teardown_end_at: Optional[datetime] = None
+    arrival_plan: Optional[str] = None
+    staffing_notes: Optional[str] = None
+    equipment_notes: Optional[str] = None
+    inventory_notes: Optional[str] = None
+    travel_notes: Optional[str] = None
+    calendar_visibility: Optional[bool] = None
     notes: Optional[str] = None
+    attended: Optional[bool] = None
+    revenue_eur: Optional[Decimal] = Field(default=None, ge=0, max_digits=12, decimal_places=2)
+    costs_eur: Optional[Decimal] = Field(default=None, ge=0, max_digits=12, decimal_places=2)
+    weather_notes: Optional[str] = None
+    best_selling_items: Optional[str] = None
+    operational_notes: Optional[str] = None
+    customer_notes: Optional[str] = None
+    rating: Optional[int] = Field(default=None, ge=1, le=5)
+    attend_again: Optional[bool] = None
+    lessons_learned: Optional[str] = None
 
 
-class OperationRead(OperationBase):
+class EngagementRead(EngagementBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    profit_eur: Decimal
     created_at: datetime
     updated_at: datetime

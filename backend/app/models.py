@@ -1,11 +1,23 @@
 from __future__ import annotations
 
-from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from .database import Base
 from .venue_registry import VENUE_FIELDS
+
+
+class OpportunitySeries(Base):
+    __tablename__ = "opportunity_series"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False, unique=True, index=True)
+    active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
+
+    opportunities = relationship("Opportunity", back_populates="series")
 
 
 class Opportunity(Base):
@@ -27,11 +39,19 @@ class Opportunity(Base):
     profit_score = Column(Float, nullable=True, index=True)
     is_active = Column(Boolean, nullable=False, default=True)
     venue_id = Column(Integer, ForeignKey("venues.id", ondelete="SET NULL"), nullable=True, index=True)
+    opportunity_series_id = Column(
+        Integer, ForeignKey("opportunity_series.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
 
     venue = relationship("Venue", back_populates="opportunities")
-    operations = relationship("Operation", back_populates="opportunity", cascade="all, delete-orphan")
+    series = relationship("OpportunitySeries", back_populates="opportunities")
+    engagements = relationship("Engagement", back_populates="opportunity", cascade="all, delete-orphan")
+
+    @property
+    def series_name(self):
+        return self.series.name if self.series else None
 
 
 # Temporary source-compatibility alias while the existing opportunity UI is migrated.
@@ -48,8 +68,8 @@ class Organizer(Base):
     notes = Column(Text, nullable=True)
 
 
-class Operation(Base):
-    __tablename__ = "operations"
+class Engagement(Base):
+    __tablename__ = "engagements"
 
     id = Column(Integer, primary_key=True, index=True)
     opportunity_id = Column(
@@ -57,11 +77,34 @@ class Operation(Base):
     )
     status = Column(String(50), nullable=False, default="committed", index=True)
     commitment_date = Column(Date, nullable=True)
+    pitch_number = Column(String(100), nullable=True)
+    setup_start_at = Column(DateTime(timezone=True), nullable=True)
+    setup_end_at = Column(DateTime(timezone=True), nullable=True)
+    teardown_start_at = Column(DateTime(timezone=True), nullable=True)
+    teardown_end_at = Column(DateTime(timezone=True), nullable=True)
+    arrival_plan = Column(Text, nullable=True)
+    staffing_notes = Column(Text, nullable=True)
+    equipment_notes = Column(Text, nullable=True)
+    inventory_notes = Column(Text, nullable=True)
+    travel_notes = Column(Text, nullable=True)
+    calendar_visibility = Column(Boolean, nullable=False, default=True)
     notes = Column(Text, nullable=True)
+    attended = Column(Boolean, nullable=False, default=True)
+    revenue_eur = Column(Numeric(12, 2), nullable=False, default=0)
+    costs_eur = Column(Numeric(12, 2), nullable=False, default=0)
+    profit_eur = Column(Numeric(12, 2), nullable=False, default=0)
+    weather_notes = Column(Text, nullable=True)
+    best_selling_items = Column(Text, nullable=True)
+    operational_notes = Column(Text, nullable=True)
+    customer_notes = Column(Text, nullable=True)
+    rating = Column(Integer, nullable=True)
+    attend_again = Column(Boolean, nullable=True)
+    lessons_learned = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now(), nullable=False)
 
-    opportunity = relationship("Opportunity", back_populates="operations")
+    opportunity = relationship("Opportunity", back_populates="engagements")
+
 
 
 class Venue(Base):

@@ -2,7 +2,7 @@
 
 ## Updated Core Tables
 
-The updated domain model uses Opportunities and Operations rather than generic event/trading language.
+The updated domain model uses Opportunities and Engagements rather than generic event/trading language.
 
 ## opportunity_series
 
@@ -116,13 +116,13 @@ Suggested fields:
 - created_at
 - updated_at
 
-## operations
+## engagements
 
 A committed real-world plan to vend at an opportunity.
 
-Milestone 05 implements the relationship, status, commitment date, notes, and
-timestamps needed by planning views. The remaining fields below are deferred to
-the detailed operation workflow milestone.
+Milestone 07 implements the detailed engagement workflow below. Opportunity
+series are normalized and referenced from opportunities; actual results live on
+the engagement itself rather than a separate one-to-one outcome table.
 
 Suggested fields:
 
@@ -143,17 +143,6 @@ Suggested fields:
 - travel_notes
 - calendar_visibility
 - notes
-- created_at
-- updated_at
-
-## operation_outcomes
-
-Actual results after an operation.
-
-Suggested fields:
-
-- id
-- operation_id
 - attended
 - revenue_eur
 - costs_eur
@@ -167,6 +156,9 @@ Suggested fields:
 - lessons_learned
 - created_at
 - updated_at
+
+`profit_eur` is maintained by the service as `revenue_eur - costs_eur`; clients
+cannot supply a conflicting value.
 
 ## utilities
 
@@ -205,7 +197,7 @@ Suggested fields:
 - organiser_id
 - venue_id
 - application_id
-- operation_id
+- engagement_id
 - source_id
 - notes
 
@@ -247,7 +239,7 @@ Suggested fields:
 - opportunities.research_status
 - opportunities.application_status_summary
 - opportunities.profit_score
-- operations.status
+- engagements.status
 - applications.status
 - applications.deadline
 - venues.town

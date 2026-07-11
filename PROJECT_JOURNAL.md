@@ -1,5 +1,34 @@
 # Project Journal
 
+## Milestone 07 — Engagements And Results
+
+### Date
+
+2026-07-06
+
+### Summary
+
+Completed the business loop from a committed opportunity through engagement
+planning, actual financial results, and year-over-year learning.
+
+### Key Changes
+
+- Expanded engagements with pitch, setup, teardown, arrival, staffing,
+  equipment, inventory, travel, calendar visibility, and general notes.
+- Added normalized opportunity-series assignment plus opportunity-level actions
+  to create, attach, and detach series as recurrence becomes known.
+- Folded result fields onto engagements instead of keeping a one-to-one outcome
+  table; the backend calculates profit from revenue and costs on every write,
+  with rating and attend-again reflections alongside qualitative notes.
+- Added derived comparisons by series, venue, organizer, and municipality.
+- Added a dedicated Engagements workspace plus API, migration, component/build,
+  backend, contract, and browser-journey coverage.
+
+### Why This Matters
+
+CrazyKok can now compare what was expected with what actually happened without
+mixing annual business results into static venue or discovery records.
+
 ## Milestone 12 — End-to-End UI Testing
 
 ### Date
@@ -44,9 +73,9 @@ FullCalendar.
 ### Key Changes
 
 - Added a filterable HAL planning projection joining opportunities, venue
-  coordinates, application deadlines, and committed operations.
-- Added minimal committed-operation records without pulling Milestone 07's
-  detailed staffing, equipment, and outcome workflow forward.
+  coordinates, application deadlines, and committed engagements.
+- Added minimal committed-engagement records without pulling Milestone 07's
+  detailed staffing, equipment, and result workflow forward.
 - Added straight-line distance filtering from a configurable Schoonebeek home
   location and editable 0–100 profit scores.
 - Added map markers, calendar entries, in-context detail, and visible warnings
@@ -98,17 +127,17 @@ no longer drift quietly into undocumented or client-breaking behavior.
 
 ### Summary
 
-Updated the project language and model from an event/trading vocabulary to an opportunity/operation vocabulary.
+Updated the project language and model from an event/trading vocabulary to an opportunity/engagement vocabulary.
 
 ### Key Changes
 
 - Replaced "event occurrence" as the central planning object with **Opportunity**.
-- Replaced "trading commitment" with **Operation**.
-- Replaced "trading history/session" with **Operation Outcome**.
+- Replaced "trading commitment" with **Engagement**.
+- Kept actual trading history/result fields on **Engagement** rather than a separate one-to-one outcome entity.
 - Added calendar subscription feeds using ICS.
 - Added a future milestone for calendar feed integration.
-- Updated the ERD to separate relatively static venue data from year-over-year opportunities and operations.
-- Added ADRs for domain language, opportunity/operation separation, and ICS feeds.
+- Updated the ERD to separate relatively static venue data from year-over-year opportunities and engagements.
+- Added ADRs for domain language, opportunity/engagement separation, and ICS feeds.
 
 ### Why This Matters
 
@@ -116,8 +145,7 @@ The application should distinguish:
 
 1. possible places to vend,
 2. the user's application/reservation process,
-3. committed real-world operations,
-4. actual outcomes after attending.
+3. committed real-world engagements with actual results after attending.
 
 This supports year-over-year comparisons without polluting static venue records or mixing operational data into opportunity discovery records.
 
