@@ -70,6 +70,13 @@ def test_update_requires_current_hash_and_preserves_identity(tmp_path: Path):
     assert updated.status == "accepted"
 
 
+def test_resources_are_an_optional_preserved_section(tmp_path: Path):
+    record = AdrService(tmp_path).create(proposal(sections=dict(proposal().sections, Resources="- [Diagram](assets/diagram.svg)")))
+
+    assert record.sections["Resources"] == "- [Diagram](assets/diagram.svg)"
+    assert "## Resources\n\n- [Diagram](assets/diagram.svg)" in record.markdown
+
+
 def test_accepted_decision_cannot_be_rewritten(tmp_path: Path):
     service = AdrService(tmp_path)
     accepted = service.create(proposal(status="accepted"))

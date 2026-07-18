@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" role="img" aria-labelledby="title desc">
+  <title id="title">CrazyKok authentication surface map</title>
+  <desc id="desc">Browser traffic reaches Nginx, which routes to authentik, the app, API, database manager, documentation, and API reference. Authentik connects to upstream SSO, Postgres, and Redis. The API connects to the CrazyKok SQLite data store.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#355248"/></marker>
+    <style>
+      .bg{fill:#fffefa}.box{fill:#f7f2e6;stroke:#b9ad98;stroke-width:2}.dark{fill:#18382e;stroke:#18382e}.accent{fill:#fff3cf;stroke:#d59632;stroke-width:2}.store{fill:#e7f1ec;stroke:#7fab95;stroke-width:2}.text{font:600 18px Inter,Arial,sans-serif;fill:#18382e}.small{font:500 13px Inter,Arial,sans-serif;fill:#53645e}.white{fill:#fffefa}.line{stroke:#355248;stroke-width:2.4;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="980" height="560" rx="24"/>
+  <text x="40" y="52" class="text" style="font-size:28px">Authentication Surface Map</text>
+  <text x="40" y="78" class="small">Nginx is the public gateway; authentik is the identity service; FastAPI still enforces API identity and roles.</text>
+  <rect x="60" y="210" width="150" height="80" rx="14" class="box"/><text x="135" y="246" text-anchor="middle" class="text">Browser</text><text x="135" y="269" text-anchor="middle" class="small">operator</text>
+  <rect x="300" y="190" width="170" height="120" rx="16" class="dark"/><text x="385" y="242" text-anchor="middle" class="text white">Nginx</text><text x="385" y="266" text-anchor="middle" class="small white">TLS gateway</text>
+  <rect x="610" y="70" width="150" height="76" rx="14" class="accent"/><text x="685" y="104" text-anchor="middle" class="text">auth</text><text x="685" y="126" text-anchor="middle" class="small">authentik</text>
+  <rect x="610" y="174" width="150" height="70" rx="14" class="box"/><text x="685" y="205" text-anchor="middle" class="text">app</text><text x="685" y="226" text-anchor="middle" class="small">React</text>
+  <rect x="610" y="272" width="150" height="70" rx="14" class="box"/><text x="685" y="303" text-anchor="middle" class="text">api</text><text x="685" y="324" text-anchor="middle" class="small">FastAPI</text>
+  <rect x="610" y="370" width="150" height="70" rx="14" class="box"/><text x="685" y="401" text-anchor="middle" class="text">db</text><text x="685" y="422" text-anchor="middle" class="small">manager</text>
+  <rect x="805" y="210" width="130" height="70" rx="14" class="box"/><text x="870" y="241" text-anchor="middle" class="text">docs</text><text x="870" y="262" text-anchor="middle" class="small">read-only</text>
+  <rect x="805" y="306" width="130" height="70" rx="14" class="box"/><text x="870" y="337" text-anchor="middle" class="text">api-docs</text><text x="870" y="358" text-anchor="middle" class="small">contract</text>
+  <rect x="815" y="70" width="120" height="56" rx="12" class="store"/><text x="875" y="104" text-anchor="middle" class="small">Upstream SSO</text>
+  <rect x="815" y="140" width="120" height="56" rx="12" class="store"/><text x="875" y="174" text-anchor="middle" class="small">Auth DB/Redis</text>
+  <rect x="815" y="430" width="120" height="56" rx="12" class="store"/><text x="875" y="464" text-anchor="middle" class="small">SQLite + files</text>
+  <path class="line" d="M210 250 H300"/><path class="line" d="M470 226 C530 182 548 108 610 108"/><path class="line" d="M470 238 H610"/><path class="line" d="M470 258 C530 258 548 307 610 307"/><path class="line" d="M470 275 C530 310 548 405 610 405"/><path class="line" d="M760 108 H815"/><path class="line" d="M760 126 C790 130 790 168 815 168"/><path class="line" d="M760 307 C790 350 790 458 815 458"/><path class="line" d="M760 230 C782 230 782 245 805 245"/><path class="line" d="M760 318 C782 318 782 341 805 341"/>
+</svg>

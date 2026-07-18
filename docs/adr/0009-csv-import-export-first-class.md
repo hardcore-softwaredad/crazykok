@@ -40,3 +40,17 @@ Keeps data portable and compatible with spreadsheets and AI-assisted workflows.
 ## Review Trigger
 
 Review this ADR if the project scope, deployment model, data model, or primary workflow changes materially.
+
+## Resources
+
+- [Venue import template snapshot](assets/0009-csv-import-export-first-class/venues_import_template.csv)
+- [Venue import example snapshot](assets/0009-csv-import-export-first-class/venues_import_example.csv)
+- [Venue contact import template snapshot](assets/0009-csv-import-export-first-class/venue_contacts_import_template.csv)
+- [Venue document import template snapshot](assets/0009-csv-import-export-first-class/venue_documents_import_template.csv)
+- [Venue alias import template snapshot](assets/0009-csv-import-export-first-class/venue_aliases_import_template.csv)
+- [Opportunity import template snapshot](assets/0009-csv-import-export-first-class/opportunities_import_template.csv)
+- [Opportunity local seed snapshot](assets/0009-csv-import-export-first-class/opportunities_local_seed.csv)
+- [Venue import JSON schema snapshot](assets/0009-csv-import-export-first-class/venue_import_schema.json)
+- [Import/export specification](../IMPORT_EXPORT_SPEC.md)
+- [Venue import/export rules](../VENUE_IMPORT_EXPORT_RULES.md)
+- [Venue research import workflow](../VENUE_RESEARCH_IMPORT_WORKFLOW.md)

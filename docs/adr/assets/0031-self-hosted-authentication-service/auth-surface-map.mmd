@@ -1,0 +1,11 @@
+flowchart LR
+    Browser[Browser / operator] --> Gateway[Nginx TLS gateway]
+    Gateway --> Auth[auth.crazykok authentik]
+    Gateway --> App[app.crazykok React app]
+    Gateway --> API[api.crazykok FastAPI]
+    Gateway --> DB[db.crazykok database manager]
+    Gateway --> Docs[docs / API reference]
+    Auth --> Upstream[Upstream SSO providers]
+    Auth --> AuthDB[(auth Postgres)]
+    Auth --> AuthRedis[(auth Redis)]
+    API --> AppDB[(CrazyKok SQLite + attachments)]

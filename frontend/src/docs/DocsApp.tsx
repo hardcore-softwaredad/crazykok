@@ -19,6 +19,46 @@ function Link({ href, children, className }: { href: string; children: React.Rea
   return <a href={href} className={className} onClick={(event) => { event.preventDefault(); navigate(href) }}>{children}</a>
 }
 
+function docsAssetHref(href?: string, documentPath?: string) {
+  if (!href) return href
+  if (/^(https?:|mailto:|#)/.test(href)) return href
+  let resolved = href
+  if (href.startsWith('assets/')) resolved = `/adr-assets/${href.slice('assets/'.length)}`
+  else if (href.startsWith('../')) resolved = `/doc-assets/${href.replace(/^\.\.\//, '')}`
+  else if (!href.startsWith('/') && documentPath) resolved = new URL(href, `https://docs.crazykok${documentPath}`).pathname + (href.includes('#') ? `#${href.split('#', 2)[1]}` : '')
+  const [pathname] = resolved.split('#', 1)
+  if (/^\/(?:adr-assets|doc-assets)\/.+\.md$/i.test(pathname)) return `/document${resolved}`
+  return resolved
+}
+
+function MarkdownLink({ href, children, documentPath }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { documentPath?: string }) {
+  const resolved = docsAssetHref(href, documentPath)
+  if (!resolved) return <a>{children}</a>
+  return <a href={resolved}>{children}</a>
+}
+
+function MarkdownImage({ src, alt, documentPath }: React.ImgHTMLAttributes<HTMLImageElement> & { documentPath?: string }) {
+  const resolved = docsAssetHref(src, documentPath)
+  return <img src={resolved} alt={alt ?? ''} loading="lazy" />
+}
+
+function MarkdownTable({ children }: React.TableHTMLAttributes<HTMLTableElement>) {
+  return <div className="table-scroll"><table>{children}</table></div>
+}
+
+function markdownComponents(documentPath?: string) {
+  return {
+    a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => <MarkdownLink {...props} documentPath={documentPath} />,
+    img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => <MarkdownImage {...props} documentPath={documentPath} />,
+    table: MarkdownTable,
+  }
+}
+
+function documentAssetPath(path: string) {
+  const match = path.match(/^\/document\/((?:adr-assets|doc-assets)\/[A-Za-z0-9][A-Za-z0-9._/-]*\.md)$/)
+  return match ? `/${match[1]}` : undefined
+}
+
 function Metadata({ record }: { record: AdrRecord }) {
   return (
     <dl className="adr-meta">
@@ -111,12 +151,41 @@ function Detail({ slug }: { slug: string }) {
       <Link className="back-link" href={`/decisions${returnQuery}`}>← All decisions</Link>
       <article className="adr-document">
         <header><p className="docs-kicker">ADR {record.id}</p><h1>{record.title}</h1><Metadata record={record} /></header>
-        <div className="markdown"><ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml>{record.markdown.replace(/^# ADR .+\n+/, '')}</ReactMarkdown></div>
+        <div className="markdown"><ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml components={markdownComponents()}>{record.markdown.replace(/^# ADR .+\n+/, '')}</ReactMarkdown></div>
       </article>
       <nav className="record-navigation" aria-label="Adjacent decisions">
         {previous ? <Link href={`/adr/${previous.slug}`}><small>Previous</small><strong>ADR {previous.id}: {previous.title}</strong></Link> : <span />}
         {next ? <Link href={`/adr/${next.slug}`}><small>Next</small><strong>ADR {next.id}: {next.title}</strong></Link> : <span />}
       </nav>
+    </>
+  )
+}
+
+function SupportingDocument({ assetPath }: { assetPath: string }) {
+  const [markdown, setMarkdown] = useState<string>()
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    setMarkdown(undefined)
+    setError(false)
+    fetch(assetPath)
+      .then((response) => response.ok ? response.text() : Promise.reject(new Error('Document unavailable')))
+      .then((content) => { if (active) setMarkdown(content) })
+      .catch(() => { if (active) setError(true) })
+    return () => { active = false }
+  }, [assetPath])
+
+  if (error) return <section className="not-found"><p className="docs-kicker">Unavailable</p><h1>Document not found</h1><p>This supporting document may have moved or is no longer published.</p><Link href="/">Return to documentation</Link></section>
+  if (!markdown) return <section className="not-found"><p className="docs-kicker">Loading</p><h1>Opening document…</h1></section>
+  const title = markdown.match(/^#\s+(.+)$/m)?.[1] ?? assetPath.split('/').pop()?.replace(/\.md$/, '') ?? 'Supporting document'
+  return (
+    <>
+      <Link className="back-link" href="/">← Documentation home</Link>
+      <article className="adr-document">
+        <header><p className="docs-kicker">Supporting document</p><h1>{title}</h1></header>
+        <div className="markdown"><ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml components={markdownComponents(assetPath)}>{markdown.replace(/^#\s+.+\n+/, '')}</ReactMarkdown></div>
+      </article>
     </>
   )
 }
@@ -129,6 +198,7 @@ export default function DocsApp() {
     return () => window.removeEventListener('popstate', sync)
   }, [])
   const match = path.match(/^\/adr\/([^/]+)\/?$/)
-  const page = match ? <Detail slug={decodeURIComponent(match[1])} /> : path === '/' ? <Portal /> : path === '/decisions' ? <Overview /> : <Detail slug="" />
+  const documentPath = documentAssetPath(path)
+  const page = documentPath ? <SupportingDocument assetPath={documentPath} /> : match ? <Detail slug={decodeURIComponent(match[1])} /> : path === '/' ? <Portal /> : path === '/decisions' ? <Overview /> : <Detail slug="" />
   return <div className="docs-site"><header className="docs-header"><Link href="/" className="docs-brand"><img src="/crazykok-logo.png" alt="" /><span>Crazy Kok <strong>Docs</strong></span></Link><nav aria-label="Documentation"><Link href="/decisions">Decisions</Link><a href="/api-reference">API</a></nav><span className="read-only">Read-only · contract-driven</span></header><main>{page}</main><footer>Crazy Kok documentation · Repository and API contracts are the sources of truth</footer></div>
 }

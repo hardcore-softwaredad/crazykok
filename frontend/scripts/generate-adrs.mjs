@@ -7,7 +7,11 @@ const frontendRoot = path.resolve(import.meta.dirname, '..')
 const sourceDirectory = process.env.ADR_SOURCE_DIR
   ? path.resolve(process.env.ADR_SOURCE_DIR)
   : path.resolve(frontendRoot, '..', 'docs', 'adr')
+const docsSourceDirectory = path.dirname(sourceDirectory)
 const outputFile = path.resolve(frontendRoot, 'src', 'docs', 'generated', 'adrs.json')
+const assetSourceDirectory = path.join(sourceDirectory, 'assets')
+const assetOutputDirectory = path.resolve(frontendRoot, 'public', 'adr-assets')
+const docsOutputDirectory = path.resolve(frontendRoot, 'public', 'doc-assets')
 const statuses = new Set(['proposed', 'accepted', 'rejected', 'deprecated', 'superseded'])
 const categories = new Set(['architecture', 'backend', 'data', 'deployment', 'domain', 'frontend', 'process', 'product', 'security'])
 const requiredSections = ['Context', 'Decision', 'Consequences', 'Alternatives Considered', 'Review Trigger']
@@ -94,4 +98,19 @@ for (const record of records) {
 records.sort((left, right) => left.id.localeCompare(right.id))
 fs.mkdirSync(path.dirname(outputFile), { recursive: true })
 fs.writeFileSync(outputFile, `${JSON.stringify(records, null, 2)}\n`)
+if (fs.existsSync(assetSourceDirectory)) {
+  fs.rmSync(assetOutputDirectory, { recursive: true, force: true })
+  fs.cpSync(assetSourceDirectory, assetOutputDirectory, {
+    recursive: true,
+    filter: (source) => !source.endsWith('.mmd'),
+  })
+}
+if (fs.existsSync(docsSourceDirectory)) {
+  fs.rmSync(docsOutputDirectory, { recursive: true, force: true })
+  fs.mkdirSync(docsOutputDirectory, { recursive: true })
+  for (const entry of fs.readdirSync(docsSourceDirectory, { withFileTypes: true })) {
+    if (entry.name === 'adr') continue
+    fs.cpSync(path.join(docsSourceDirectory, entry.name), path.join(docsOutputDirectory, entry.name), { recursive: true })
+  }
+}
 console.log(`Generated ${records.length} ADR records at ${outputFile}`)

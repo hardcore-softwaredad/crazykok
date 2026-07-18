@@ -1,0 +1,8 @@
+{
+  "name": "crazykok-api-docs",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@scalar/api-reference": "1.62.4"
+  }
+}

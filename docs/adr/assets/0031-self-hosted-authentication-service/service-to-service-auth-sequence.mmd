@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Service as Internal service
+    participant API as FastAPI API
+    participant Auth as authentik OIDC/JWKS
+    participant Handler as Protected route
+
+    Service->>API: Request with Authorization bearer token
+    alt Internal service token
+        API->>API: Compare with configured AUTH_SERVICE_TOKEN
+        API->>Handler: Treat as service principal
+    else OIDC access token
+        API->>Auth: Fetch/cache JWKS when needed
+        API->>API: Verify signature, issuer, audience, expiry
+        API->>API: Map groups/claims to roles
+        API->>Handler: Treat as external client principal
+    else Missing or invalid token
+        API-->>Service: 401 unauthorized or 403 forbidden
+    end

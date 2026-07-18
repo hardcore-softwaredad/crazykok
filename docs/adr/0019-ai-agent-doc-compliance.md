@@ -25,7 +25,7 @@ This project is a private, local-first operating system for discovering opportun
 
 ## Decision
 
-AI coding agents must follow docs and ADRs; architectural changes require new or updated ADRs.
+AI coding agents must follow docs and ADRs; architectural changes require new or updated ADRs. Agents must also consider whether point-in-time artifacts such as diagrams, ERDs, workflows, schemas, contract snapshots, and import samples should be preserved as ADR resources before finishing work. Durable feature, policy, research, and change-request context that does not meet the ADR bar belongs in the project trail and must be reviewed periodically for ADR candidates.
 
 ## Consequences
 
@@ -40,3 +40,9 @@ Prevents the agent from inventing architecture or expanding scope unexpectedly.
 ## Review Trigger
 
 Review this ADR if the project scope, deployment model, data model, or primary workflow changes materially.
+
+## Resources
+
+- [AI coding agent instructions](../AI_INSTRUCTIONS.md)
+- [ADR authoring rules](../ADR_AUTHORING.md)
+- [Project trail convention](../PROJECT_TRAIL.md)

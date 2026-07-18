@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 620" role="img" aria-labelledby="title desc">
+  <title id="title">Browser forward-auth sequence</title>
+  <desc id="desc">A browser requests a protected surface through Nginx. Nginx asks authentik outpost to validate the session. Without a session, the browser is redirected to authentik login. With a session, identity headers are proxied to the protected surface.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#355248"/></marker><style>.bg{fill:#fffefa}.head{fill:#18382e}.text{font:600 16px Inter,Arial,sans-serif;fill:#18382e}.white{fill:#fffefa}.small{font:500 13px Inter,Arial,sans-serif;fill:#53645e}.life{stroke:#c8bfad;stroke-width:2;stroke-dasharray:6 6}.msg{stroke:#355248;stroke-width:2.2;fill:none;marker-end:url(#arrow)}.return{stroke:#a54a2c;stroke-width:2.2;fill:none;marker-end:url(#arrow)}.note{fill:#fff3cf;stroke:#d59632;stroke-width:1.5}</style></defs>
+  <rect class="bg" width="980" height="620" rx="24"/>
+  <text x="40" y="52" class="text" style="font-size:28px">Browser Forward-Auth</text>
+  <text x="40" y="78" class="small">The gateway blocks protected surfaces until authentik confirms a browser session.</text>
+  <g><rect x="60" y="115" width="150" height="48" rx="12" class="head"/><text x="135" y="145" text-anchor="middle" class="white text">Browser</text></g>
+  <g><rect x="270" y="115" width="150" height="48" rx="12" class="head"/><text x="345" y="145" text-anchor="middle" class="white text">Nginx</text></g>
+  <g><rect x="480" y="115" width="150" height="48" rx="12" class="head"/><text x="555" y="145" text-anchor="middle" class="white text">Outpost</text></g>
+  <g><rect x="690" y="115" width="150" height="48" rx="12" class="head"/><text x="765" y="145" text-anchor="middle" class="white text">authentik</text></g>
+  <g><rect x="835" y="115" width="110" height="48" rx="12" class="head"/><text x="890" y="145" text-anchor="middle" class="white text">Surface</text></g>
+  <path class="life" d="M135 165V575"/><path class="life" d="M345 165V575"/><path class="life" d="M555 165V575"/><path class="life" d="M765 165V575"/><path class="life" d="M890 165V575"/>
+  <path class="msg" d="M135 205H345"/><text x="240" y="196" text-anchor="middle" class="small">GET protected URL</text>
+  <path class="msg" d="M345 250H555"/><text x="450" y="241" text-anchor="middle" class="small">auth_request + cookies</text>
+  <path class="return" d="M555 295H345"/><text x="450" y="286" text-anchor="middle" class="small">401 no session</text>
+  <path class="return" d="M345 340H135"/><text x="240" y="331" text-anchor="middle" class="small">redirect to login</text>
+  <path class="msg" d="M135 385H765"/><text x="450" y="376" text-anchor="middle" class="small">login or upstream SSO</text>
+  <path class="return" d="M765 430H135"/><text x="450" y="421" text-anchor="middle" class="small">session cookie</text>
+  <path class="msg" d="M135 475H345"/><text x="240" y="466" text-anchor="middle" class="small">retry protected URL</text>
+  <path class="msg" d="M345 510H555"/><text x="450" y="501" text-anchor="middle" class="small">auth_request with session</text>
+  <path class="return" d="M555 545H345"/><text x="450" y="536" text-anchor="middle" class="small">204 + identity headers</text>
+  <path class="msg" d="M345 575H890"/><text x="617" y="566" text-anchor="middle" class="small">proxy request with trusted identity</text>
+</svg>

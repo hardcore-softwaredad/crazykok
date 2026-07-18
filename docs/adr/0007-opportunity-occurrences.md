@@ -40,3 +40,8 @@ Allows weekly/monthly/annual events to become individual planning records.
 ## Review Trigger
 
 Review this ADR if the project scope, deployment model, data model, or primary workflow changes materially.
+
+## Resources
+
+- ![Opportunity domain flow](assets/0007-opportunity-occurrences/domain-flow.svg)
+- [Domain model reference](../DOMAIN_MODEL.md)

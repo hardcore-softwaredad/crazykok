@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Interactive reference for the Crazy Kok API" />
+    <title>Crazy Kok API Reference</title>
+    <link rel="icon" href="/crazykok-logo.png" />
+    <link rel="stylesheet" href="/api-docs.css" />
+  </head>
+  <body>
+    <a class="portal-link" href="/project-docs">Crazy Kok Docs</a>
+    <div id="app"></div>
+    <aside id="hal-explorer" aria-live="polite" aria-label="Live hypermedia links" hidden>
+      <div class="hal-heading">
+        <div><strong>Follow the live API</strong><small id="hal-source"></small></div>
+        <button id="hal-close" type="button" aria-label="Close live links">×</button>
+      </div>
+      <p>These safe GET actions came from the response’s <code>_links</code>, not from hard-coded routes.</p>
+      <div id="hal-actions"></div>
+      <pre id="hal-result" tabindex="0"></pre>
+    </aside>
+    <script src="/assets/standalone.js"></script>
+    <script src="/api-docs.js"></script>
+  </body>
+</html>

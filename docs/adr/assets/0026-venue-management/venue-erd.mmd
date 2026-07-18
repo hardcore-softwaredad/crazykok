@@ -1,0 +1,52 @@
+erDiagram
+    VENUES ||--o{ VENUE_CONTACTS : has
+    VENUES ||--o{ VENUE_DOCUMENTS : has
+    VENUES ||--o{ VENUE_ALIASES : has
+    VENUES ||--o{ OPPORTUNITIES : hosts
+
+    VENUES {
+        int id PK
+        string venue_external_id UK
+        string venue_name
+        string venue_category_primary
+        string town
+        string municipality
+        string province
+        string country
+        float latitude
+        float longitude
+        string research_status
+        string confidence_rating
+        bool active
+    }
+
+    VENUE_CONTACTS {
+        int id PK
+        string contact_external_id UK
+        int venue_id FK
+        string contact_type
+        string name
+        string email
+        string phone
+        bool active
+    }
+
+    VENUE_DOCUMENTS {
+        int id PK
+        string document_external_id UK
+        int venue_id FK
+        string document_type
+        string title
+        string url
+        string local_path
+        bool active
+    }
+
+    VENUE_ALIASES {
+        int id PK
+        string alias_external_id UK
+        int venue_id FK
+        string alias
+        string alias_type
+        bool active
+    }

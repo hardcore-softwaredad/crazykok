@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Browser as Browser
+    participant Gateway as Nginx gateway
+    participant Outpost as authentik outpost
+    participant Auth as authentik
+    participant Surface as Protected surface
+
+    Browser->>Gateway: GET protected URL
+    Gateway->>Outpost: auth_request with cookies
+    Outpost-->>Gateway: 401 when no valid session
+    Gateway-->>Browser: Redirect to authentik login flow
+    Browser->>Auth: Login or upstream SSO
+    Auth-->>Browser: Session cookie
+    Browser->>Gateway: Retry protected URL
+    Gateway->>Outpost: auth_request with session cookie
+    Outpost-->>Gateway: 204 plus X-authentik identity headers
+    Gateway->>Surface: Proxy request with trusted identity context

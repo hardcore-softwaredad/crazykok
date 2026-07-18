@@ -40,3 +40,8 @@ Avoids duplication and supports year-over-year comparisons.
 ## Review Trigger
 
 Review this ADR if the project scope, deployment model, data model, or primary workflow changes materially.
+
+## Resources
+
+- ![Normalized application ERD](assets/0006-normalized-relational-model/erd.svg)
+- [Database schema reference](../DATABASE_SCHEMA.md)

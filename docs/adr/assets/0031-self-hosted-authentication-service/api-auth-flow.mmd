@@ -1,0 +1,16 @@
+flowchart TD
+    Request[API request] --> Entry{Auth context source}
+    Entry -->|Browser via gateway| Headers[X-authentik-* proxy headers]
+    Entry -->|External client| OIDC[OIDC bearer token]
+    Entry -->|Internal service| Service[Service bearer token]
+    Entry -->|Local development| Anonymous[Anonymous local user]
+    Headers --> FastAPI[FastAPI auth gate]
+    OIDC --> FastAPI
+    Service --> FastAPI
+    Anonymous --> FastAPI
+    FastAPI --> Me[/v1/me identity surface]
+    FastAPI --> Method{Unsafe method?}
+    Method -->|No| Handler[Route handler]
+    Method -->|Yes| RoleCheck{admin / operator / service?}
+    RoleCheck -->|Allowed| Handler
+    RoleCheck -->|Denied| Forbidden[403 forbidden]

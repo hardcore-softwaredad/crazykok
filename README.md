@@ -38,11 +38,13 @@ on the active deployment and DNS configuration.
 
 | Resource | Production | Local | Purpose |
 | --- | --- | --- | --- |
+| Public website | [www.crazykok.nl](https://www.crazykok.nl) | [www.crazykok.local](https://www.crazykok.local) | Bilingual public pre-launch website supplied by the sibling `crazykok-web` project. |
 | Web application | [crazykok.com](https://crazykok.com) / [app.crazykok.com](https://app.crazykok.com) | [crazykok.local](https://crazykok.local) / [app.crazykok.local](https://app.crazykok.local) | Browser application for day-to-day work. |
 | API | [api.crazykok.com](https://api.crazykok.com/v1) | [api.crazykok.local](https://api.crazykok.local/v1) | Versioned HAL/JSON API and OpenAPI contract. |
 | Decision log | [docs.crazykok.com](https://docs.crazykok.com) | [docs.crazykok.local](https://docs.crazykok.local) | Read-only, searchable architecture decision records. |
 | API reference | [api-docs.crazykok.com](https://api-docs.crazykok.com) | [api-docs.crazykok.local](https://api-docs.crazykok.local) | Interactive, self-hosted API documentation. |
 | Database console | [db.crazykok.com](https://db.crazykok.com) | [db.crazykok.local](https://db.crazykok.local) | Private database inspection and editing surface. |
+| Authentication | [auth.crazykok.com](https://auth.crazykok.com) | [auth.crazykok.local](https://auth.crazykok.local) | Self-hosted SSO, login flows, and gateway authorization. |
 
 ## How the system fits together
 
@@ -51,13 +53,13 @@ Browser / API client
         |
         v
 Nginx HTTPS gateway (:80/:443)
-   |          |           |             |
-   v          v           v             v
-React app   FastAPI    API reference   sqlite-web
-               |                         |
-               v                         v
-       SQLite + attachments       SQLite data editor
-       (api-data volume)          (api-data volume)
+   |          |           |             |             |
+   v          v           v             v             v
+React app   FastAPI    API reference   sqlite-web   authentik
+               |                         |             |
+               v                         v             v
+       SQLite + attachments       SQLite data editor  Postgres + Redis
+       (api-data volume)          (api-data volume)   (auth volumes)
 ```
 
 Docker Compose builds four services:
@@ -73,6 +75,15 @@ Docker Compose builds four services:
 - `db` runs sqlite-web against the same persistent SQLite volume for local data
   inspection and editing. It is exposed only through the Nginx gateway at the
   configured database console hostname.
+- `auth-server` and `auth-worker` run authentik with dedicated Postgres and
+  Redis services. Nginx exposes it at the configured auth hostname and includes
+  switchable forward-auth hooks for app, API, and database-console protection.
+
+The app and the separate `crazykok-web` Compose project join the stable,
+project-agnostic `sites-gateway` Docker network. The shared local gateway owns
+host ports 80/443 and forwards Crazy Kok traffic to this app Nginx, which routes
+`www.crazykok.local` to its `crazykok-public-web` alias and resolves that alias
+at request time, so this app stack can still start when the public site is off.
 
 The architecture is intentionally local-first and portable. Production can
 replace SQLite through `DATABASE_URL`, but the application does not require a
@@ -131,8 +142,8 @@ docker compose up --build
 Add the virtual hosts to `/etc/hosts` so all local URLs resolve consistently:
 
 ```text
-127.0.0.1 crazykok.local app.crazykok.local api.crazykok.local docs.crazykok.local api-docs.crazykok.local db.crazykok.local
-::1       crazykok.local app.crazykok.local api.crazykok.local docs.crazykok.local api-docs.crazykok.local db.crazykok.local
+127.0.0.1 www.crazykok.local crazykok.local app.crazykok.local api.crazykok.local docs.crazykok.local api-docs.crazykok.local db.crazykok.local auth.crazykok.local
+::1       www.crazykok.local crazykok.local app.crazykok.local api.crazykok.local docs.crazykok.local api-docs.crazykok.local db.crazykok.local auth.crazykok.local
 ```
 
 On macOS, flush the resolver cache after changing the hosts file:
@@ -161,17 +172,24 @@ change.
 | Variable | Default | Used for |
 | --- | --- | --- |
 | `APP_ENV` | `development` | Runtime mode. Set explicitly in each deployment. |
+| `PUBLIC_SITE_DOMAIN` | `www.crazykok.local` | Public-site virtual host proxied to the sibling `crazykok-web` container. |
 | `APP_DOMAIN` | `crazykok.local` | Primary application hostname. |
 | `APP_DOMAIN_ALIAS` | `app.crazykok.local` | Alternate application hostname. |
 | `API_DOMAIN` | `api.crazykok.local` | Public API hostname and API-docs upstream. |
 | `DOCS_DOMAIN` | `docs.crazykok.local` | Decision-log hostname. |
 | `API_DOCS_DOMAIN` | `api-docs.crazykok.local` | Interactive API-reference hostname. |
 | `DB_DOMAIN` | `db.crazykok.local` | Private sqlite-web database console hostname. |
+| `AUTH_DOMAIN` | `auth.crazykok.local` | Self-hosted authentik hostname. |
+| `AUTH_GATEWAY_MODE` | `auth-disabled` | Nginx auth snippet; switch to `auth-authentik` after authentik proxy providers are configured. |
+| `AUTH_API_REQUIRED` | `false` | Requires API identity headers or service bearer token for protected API routes. |
+| `AUTH_SERVICE_TOKEN` | empty | Internal service bearer token for machine-to-machine API calls. |
+| `AUTH_WRITE_ROLES` | `admin,operator` | Roles allowed to mutate API resources when API auth is required. |
+| `AUTH_OIDC_JWKS_URL` / `AUTH_OIDC_ISSUER` / `AUTH_OIDC_AUDIENCE` | empty | Optional OIDC bearer-token validation for external API clients. |
 | `DOCS_ORIGIN` | `https://docs.crazykok.local` | Canonical decision-log URL returned after local ADR authoring. |
 | `API_DOCS_ORIGIN` | `https://api-docs.crazykok.local` | Canonical API-reference link advertised by the API. |
 | `CORS_ALLOWED_ORIGINS` | Local app and API-docs origins | Comma-separated browser origins allowed to call the API. |
-| `WEB_PORT` / `HTTPS_PORT` | `80` / `443` | Gateway host ports. |
 | `API_PORT` | `8000` | Loopback-only backend debugging port. |
+| `SITES_GATEWAY_NETWORK` | `sites-gateway` | Project-agnostic Docker network shared with the local gateway and public site. |
 | `DATABASE_URL` | `sqlite:////data/app.db` | SQLAlchemy database connection. |
 | `ATTACHMENT_ROOT` | `/data/attachments` | Venue attachment storage inside the persistent volume. |
 | `MAX_ATTACHMENT_BYTES` | `20971520` | Maximum venue upload size in bytes (20 MiB by default). |
@@ -195,6 +213,19 @@ source .venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt
 pytest
 ```
+
+The app includes an **Import opportunities** workspace for applying opportunity
+CSV files. To run the same cleanup/import from the command line against the
+default SQLite database:
+
+```sh
+DATABASE_URL=sqlite:///backend/data/app.db alembic -c backend/alembic.ini upgrade head
+DATABASE_URL=sqlite:///backend/data/app.db python scripts/import_local_opportunities.py --seed-venues --clean-regression-junk
+```
+
+The seed import uses `templates/opportunities_local_seed.csv`: venues remain
+physical places, while recurring markets and races become opportunity series
+with dated opportunities underneath them.
 
 Frontend setup and tests:
 

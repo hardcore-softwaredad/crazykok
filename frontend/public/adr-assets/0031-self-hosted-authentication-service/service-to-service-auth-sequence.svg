@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 590" role="img" aria-labelledby="title desc">
+  <title id="title">Service-to-service authentication sequence</title>
+  <desc id="desc">Internal and external machine clients call the FastAPI API with bearer tokens. FastAPI accepts a configured internal service token or verifies OIDC tokens against authentik JWKS before allowing protected route access.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#355248"/></marker><style>.bg{fill:#fffefa}.head{fill:#18382e}.text{font:600 16px Inter,Arial,sans-serif;fill:#18382e}.white{fill:#fffefa}.small{font:500 13px Inter,Arial,sans-serif;fill:#53645e}.life{stroke:#c8bfad;stroke-width:2;stroke-dasharray:6 6}.msg{stroke:#355248;stroke-width:2.2;fill:none;marker-end:url(#arrow)}.return{stroke:#a54a2c;stroke-width:2.2;fill:none;marker-end:url(#arrow)}.note{fill:#e7f1ec;stroke:#7fab95;stroke-width:1.5}</style></defs>
+  <rect class="bg" width="980" height="590" rx="24"/>
+  <text x="40" y="52" class="text" style="font-size:28px">Machine-to-Machine API Auth</text>
+  <text x="40" y="78" class="small">Service clients do not depend on browser cookies; the API validates bearer credentials directly.</text>
+  <rect x="75" y="115" width="170" height="48" rx="12" class="head"/><text x="160" y="145" text-anchor="middle" class="white text">Internal service</text>
+  <rect x="335" y="115" width="150" height="48" rx="12" class="head"/><text x="410" y="145" text-anchor="middle" class="white text">FastAPI</text>
+  <rect x="595" y="115" width="170" height="48" rx="12" class="head"/><text x="680" y="145" text-anchor="middle" class="white text">authentik</text>
+  <rect x="815" y="115" width="120" height="48" rx="12" class="head"/><text x="875" y="145" text-anchor="middle" class="white text">Route</text>
+  <path class="life" d="M160 165V540"/><path class="life" d="M410 165V540"/><path class="life" d="M680 165V540"/><path class="life" d="M875 165V540"/>
+  <path class="msg" d="M160 210H410"/><text x="285" y="201" text-anchor="middle" class="small">Authorization: Bearer token</text>
+  <rect x="320" y="240" width="180" height="62" rx="12" class="note"/><text x="410" y="265" text-anchor="middle" class="text">Path A</text><text x="410" y="286" text-anchor="middle" class="small">configured service token</text>
+  <path class="msg" d="M410 330H875"/><text x="642" y="321" text-anchor="middle" class="small">service principal allowed</text>
+  <path class="return" d="M875 365H160"/><text x="518" y="356" text-anchor="middle" class="small">response</text>
+  <rect x="320" y="402" width="180" height="62" rx="12" class="note"/><text x="410" y="427" text-anchor="middle" class="text">Path B</text><text x="410" y="448" text-anchor="middle" class="small">OIDC access token</text>
+  <path class="msg" d="M410 488H680"/><text x="545" y="479" text-anchor="middle" class="small">fetch/cache JWKS</text>
+  <path class="return" d="M680 520H410"/><text x="545" y="511" text-anchor="middle" class="small">keys</text>
+  <path class="msg" d="M410 550H875"/><text x="642" y="541" text-anchor="middle" class="small">verified claims + roles</text>
+</svg>

@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Query
 from .adr_service import (
     CATEGORIES,
     REQUIRED_SECTIONS,
+    OPTIONAL_SECTIONS,
     SCHEMA_VERSION,
     STATUSES,
     AdrError,
@@ -52,6 +53,7 @@ def get_schema():
         "statuses": STATUSES,
         "categories": CATEGORIES,
         "required_sections": REQUIRED_SECTIONS,
+        "optional_sections": OPTIONAL_SECTIONS,
         "tag_format": "lower-case kebab-case",
         "id_policy": "server allocated, four digits, immutable, never reused",
     }

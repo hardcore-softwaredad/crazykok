@@ -42,6 +42,7 @@ REQUIRED_SECTIONS = (
     "Alternatives Considered",
     "Review Trigger",
 )
+OPTIONAL_SECTIONS = ("Resources",)
 METADATA_KEYS = {
     "schema_version",
     "id",
@@ -150,9 +151,10 @@ def _validate_proposal(proposal: AdrProposal) -> AdrProposal:
     proposal.keywords = _normalise_values(proposal.keywords, "keywords", False)
     if not proposal.tags:
         raise AdrError("missing_tags", "At least one tag is required", "tags")
-    if set(proposal.sections) != set(REQUIRED_SECTIONS):
+    known_sections = set(REQUIRED_SECTIONS) | set(OPTIONAL_SECTIONS)
+    if not set(REQUIRED_SECTIONS).issubset(proposal.sections) or not set(proposal.sections).issubset(known_sections):
         missing = sorted(set(REQUIRED_SECTIONS) - set(proposal.sections))
-        extra = sorted(set(proposal.sections) - set(REQUIRED_SECTIONS))
+        extra = sorted(set(proposal.sections) - known_sections)
         detail = []
         if missing:
             detail.append(f"missing {', '.join(missing)}")
@@ -279,6 +281,9 @@ def serialise_adr(record_id: str, slug: str, proposal: AdrProposal, superseded_b
     parts = [f"---\n{front_matter}\n---", f"# ADR {record_id}: {proposal.title}"]
     for heading in REQUIRED_SECTIONS:
         parts.append(f"## {heading}\n\n{proposal.sections[heading]}")
+    for heading in OPTIONAL_SECTIONS:
+        if heading in proposal.sections:
+            parts.append(f"## {heading}\n\n{proposal.sections[heading]}")
     return "\n\n".join(parts) + "\n"
 
 

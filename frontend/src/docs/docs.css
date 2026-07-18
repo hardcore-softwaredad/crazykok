@@ -63,7 +63,9 @@ mark { border-radius: 2px; background: #ffe08a; color: inherit; padding: 0 1px; 
 .markdown code { border-radius: 4px; background: #ede9df; padding: 2px 5px; }
 .markdown pre { overflow: auto; border-radius: 8px; background: #172a24; color: #f6f0e3; padding: 18px; }
 .markdown pre code { background: transparent; padding: 0; }
-.markdown table { width: 100%; border-collapse: collapse; }
+.markdown img { display: block; width: 100%; height: auto; margin: 18px 0 26px; border: 1px solid #d8d2c3; border-radius: 12px; background: #fffefa; box-shadow: 0 10px 30px rgba(55, 48, 34, .06); }
+.markdown .table-scroll { width: 100%; overflow-x: auto; margin: 1.4em 0; border: 1px solid #d8d2c3; border-radius: 8px; }
+.markdown table { width: max-content; min-width: 100%; border-collapse: collapse; }
 .markdown th, .markdown td { border: 1px solid #d8d2c3; padding: 8px; text-align: left; }
 .record-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 820px; margin: 18px auto 70px; }
 .record-navigation a { display: grid; gap: 5px; border: 1px solid #d8d2c3; border-radius: 12px; background: #fffdf8; padding: 17px; text-decoration: none; }

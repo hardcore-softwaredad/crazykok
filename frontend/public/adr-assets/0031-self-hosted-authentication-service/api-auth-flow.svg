@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 620" role="img" aria-labelledby="title desc">
+  <title id="title">API authorization flow</title>
+  <desc id="desc">FastAPI accepts identity from proxy headers, OIDC bearer tokens, internal service tokens, or local anonymous development mode. Unsafe methods require admin, operator, or service roles.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#355248"/></marker><style>.bg{fill:#fffefa}.box{fill:#f7f2e6;stroke:#b9ad98;stroke-width:2}.gate{fill:#18382e;stroke:#18382e}.ok{fill:#e7f1ec;stroke:#7fab95;stroke-width:2}.deny{fill:#f7dfd5;stroke:#bd6a4d;stroke-width:2}.text{font:600 17px Inter,Arial,sans-serif;fill:#18382e}.small{font:500 13px Inter,Arial,sans-serif;fill:#53645e}.white{fill:#fffefa}.line{stroke:#355248;stroke-width:2.2;fill:none;marker-end:url(#arrow)}</style></defs>
+  <rect class="bg" width="980" height="620" rx="24"/>
+  <text x="40" y="52" class="text" style="font-size:28px">API Authorization Flow</text>
+  <text x="40" y="78" class="small">FastAPI verifies identity independently of UI hints and enforces roles for write operations.</text>
+  <rect x="60" y="270" width="130" height="70" rx="14" class="box"/><text x="125" y="300" text-anchor="middle" class="text">API</text><text x="125" y="322" text-anchor="middle" class="small">request</text>
+  <rect x="275" y="248" width="160" height="114" rx="18" class="gate"/><text x="355" y="294" text-anchor="middle" class="text white">Auth context</text><text x="355" y="318" text-anchor="middle" class="small white">source?</text>
+  <rect x="520" y="102" width="180" height="62" rx="14" class="box"/><text x="610" y="128" text-anchor="middle" class="text">Proxy headers</text><text x="610" y="148" text-anchor="middle" class="small">browser session</text>
+  <rect x="520" y="202" width="180" height="62" rx="14" class="box"/><text x="610" y="228" text-anchor="middle" class="text">OIDC bearer</text><text x="610" y="248" text-anchor="middle" class="small">external client</text>
+  <rect x="520" y="302" width="180" height="62" rx="14" class="box"/><text x="610" y="328" text-anchor="middle" class="text">Service token</text><text x="610" y="348" text-anchor="middle" class="small">machine client</text>
+  <rect x="520" y="402" width="180" height="62" rx="14" class="box"/><text x="610" y="428" text-anchor="middle" class="text">Anonymous</text><text x="610" y="448" text-anchor="middle" class="small">local dev only</text>
+  <rect x="775" y="248" width="150" height="90" rx="16" class="gate"/><text x="850" y="286" text-anchor="middle" class="text white">FastAPI</text><text x="850" y="310" text-anchor="middle" class="small white">auth gate</text>
+  <rect x="775" y="380" width="150" height="72" rx="14" class="box"/><text x="850" y="409" text-anchor="middle" class="text">Unsafe?</text><text x="850" y="431" text-anchor="middle" class="small">POST/PUT/PATCH/DELETE</text>
+  <rect x="555" y="525" width="150" height="60" rx="14" class="ok"/><text x="630" y="561" text-anchor="middle" class="text">Handler</text>
+  <rect x="775" y="525" width="150" height="60" rx="14" class="deny"/><text x="850" y="561" text-anchor="middle" class="text">403</text>
+  <path class="line" d="M190 305H275"/><path class="line" d="M435 276 C475 230 480 133 520 133"/><path class="line" d="M435 292 C475 260 480 233 520 233"/><path class="line" d="M435 318 C475 340 480 333 520 333"/><path class="line" d="M435 340 C475 390 480 433 520 433"/>
+  <path class="line" d="M700 133 C748 150 748 273 775 273"/><path class="line" d="M700 233 C748 238 748 288 775 288"/><path class="line" d="M700 333 C748 325 748 306 775 306"/><path class="line" d="M700 433 C748 420 748 322 775 322"/>
+  <path class="line" d="M850 338V380"/><path class="line" d="M775 416 C725 430 688 500 648 525"/><text x="705" y="482" class="small">safe read</text><path class="line" d="M850 452V525"/><text x="862" y="493" class="small">no role</text><path class="line" d="M775 416 C720 410 665 500 630 525"/><text x="625" y="490" class="small">admin/operator/service</text>
+</svg>

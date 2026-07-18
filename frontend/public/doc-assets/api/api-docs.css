@@ -1,0 +1,16 @@
+:root { color-scheme: light dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+body { margin: 0; }
+.portal-link { position: fixed; z-index: 50; right: 18px; top: 13px; border: 1px solid #b8b8b8; border-radius: 999px; background: Canvas; color: #a54a2c; padding: 7px 12px; font-size: 12px; font-weight: 700; text-decoration: none; }
+#hal-explorer { position: fixed; z-index: 100; right: 18px; bottom: 18px; width: min(440px, calc(100vw - 36px)); max-height: min(620px, calc(100vh - 36px)); overflow: auto; border: 1px solid #cfbea9; border-radius: 14px; background: Canvas; color: CanvasText; padding: 16px; box-shadow: 0 18px 60px rgb(0 0 0 / 22%); }
+.hal-heading { display: flex; justify-content: space-between; gap: 12px; }
+.hal-heading div { min-width: 0; }
+.hal-heading strong, .hal-heading small { display: block; }
+.hal-heading small { overflow: hidden; margin-top: 3px; color: #65756f; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.hal-heading button { border: 0; background: transparent; color: inherit; font-size: 24px; cursor: pointer; }
+#hal-explorer p { color: #65756f; font-size: 12px; line-height: 1.45; }
+#hal-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+#hal-actions button { border: 1px solid #a54a2c; border-radius: 999px; background: transparent; color: #a54a2c; padding: 7px 10px; font-weight: 700; cursor: pointer; }
+#hal-actions button:disabled { border-color: #aaa; color: #777; cursor: help; }
+#hal-result { display: none; max-height: 260px; overflow: auto; border-radius: 8px; background: #172a24; color: #f6f0e3; padding: 12px; font-size: 11px; white-space: pre-wrap; }
+#hal-result:not(:empty) { display: block; }
+@media (max-width: 700px) { .portal-link { right: 8px; top: 8px; } #hal-explorer { right: 9px; bottom: 9px; width: calc(100vw - 18px); } }

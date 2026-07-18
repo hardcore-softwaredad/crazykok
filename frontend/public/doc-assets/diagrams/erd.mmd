@@ -1,0 +1,77 @@
+erDiagram
+    OPPORTUNITY_SERIES ||--o{ OPPORTUNITIES : produces
+    ORGANISERS ||--o{ OPPORTUNITY_SERIES : manages
+    ORGANISERS ||--o{ OPPORTUNITIES : coordinates
+    VENUES ||--o{ OPPORTUNITIES : hosts
+    OPPORTUNITIES ||--o{ APPLICATIONS : has
+    OPPORTUNITIES ||--o{ ENGAGEMENTS : may_become
+    APPLICATIONS ||--o{ ENGAGEMENTS : may_result_in
+    OPPORTUNITIES ||--o{ UTILITIES : offers
+    OPPORTUNITIES ||--o{ DOCUMENTS : references
+    ENGAGEMENTS ||--o{ DOCUMENTS : uses
+    RESEARCH_SOURCES ||--o{ DOCUMENTS : supports
+    CALENDAR_FEEDS }o--o{ OPPORTUNITIES : can_include
+    CALENDAR_FEEDS }o--o{ ENGAGEMENTS : can_include
+
+    OPPORTUNITY_SERIES {
+        int id PK
+        string name
+        string category
+        string recurring_pattern
+        string official_website_url
+    }
+
+    OPPORTUNITIES {
+        int id PK
+        int opportunity_series_id FK
+        int venue_id FK
+        int organiser_id FK
+        string title
+        date start_date
+        date end_date
+        string research_status
+        string application_status_summary
+        float profit_score
+    }
+
+    VENUES {
+        int id PK
+        string name
+        string town
+        string municipality
+        float latitude
+        float longitude
+    }
+
+    APPLICATIONS {
+        int id PK
+        int opportunity_id FK
+        string status
+        date deadline
+        date submitted_at
+        string pitch_number
+    }
+
+    ENGAGEMENTS {
+        int id PK
+        int opportunity_id FK
+        int application_id FK
+        string status
+        datetime setup_start_at
+        datetime teardown_end_at
+        string pitch_number
+        bool attended
+        float revenue_eur
+        float costs_eur
+        float profit_eur
+        bool attend_again
+    }
+
+    CALENDAR_FEEDS {
+        int id PK
+        string name
+        string feed_type
+        string filter_json
+        string token
+        bool active
+    }

@@ -42,3 +42,10 @@ Treat venues as managed domain records that opportunities can reference. Keep st
 ## Review Trigger
 
 Review this ADR if venue identity, geocoding, or historical-address requirements need a more specialized model.
+
+## Resources
+
+- ![Venue management ERD](assets/0026-venue-management/venue-erd.svg)
+- [Venue schema reference](../VENUE_SCHEMA.md)
+- [Venue field dictionary](../VENUE_FIELD_DICTIONARY.md)
+- [Venue SQL DDL](../VENUE_SCHEMA_SQL_DDL.md)
